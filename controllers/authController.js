@@ -1,87 +1,116 @@
 // controllers/authController.js
-// Este archivo contiene la lógica para las operaciones de autenticación (registro, login, logout).
-
-const bcrypt = require('bcrypt'); // Módulo para el hash de contraseñas
-const db = require('../db'); // Importa el pool de conexiones a la base de datos
-
+const bcrypt = require('bcrypt');
+const UserModel = require('../models/UserModel');       // Importa el nuevo Modelo de Usuario
+const CredentialModel = require('../models/CredentialModel'); // Importa el nuevo Modelo de Credenciales
+const ProfileModel = require('../models/ProfileModel');     // Importa el nuevo Modelo de Perfil
+//NOTAAA:
+const prefijo = "/usuario/" //aca la barra al principio hace la diferencha para desde el action del formulario no duplicar la ruta,
 const authController = {
-    // Renderiza la página de inicio de sesión
     getLoginPage: (req, res) => {
-        // Si el usuario ya está logueado, redirige al dashboard directamente
         if (req.session.user) {
             return res.redirect('/dashboard');
         }
-        // Renderiza la plantilla 'login.pug' y pasa el mensaje de error si existe
-        res.render('login', { error: req.query.error });
+
+        console.log(`Erro getLoginPage(): ${req.query.error}`)
+        res.render('login', {
+            prefijo: prefijo,
+            title: "Iniciar secion"
+        });
     },
 
-    // Renderiza la página de registro
     getRegisterPage: (req, res) => {
-        // Si el usuario ya está logueado, redirige al dashboard directamente
         if (req.session.user) {
             return res.redirect('/dashboard');
         }
-        // Renderiza la plantilla 'register.pug' y pasa el mensaje de error si existe
-        res.render('register', { error: req.query.error });
+        console.log(`Erro getRegisterPage(): ${req.query.error}`)
+        res.render('register', {
+            prefijo: prefijo,
+            title: "Registro"
+        });
     },
 
-    // Maneja el envío del formulario de registro
     postRegister: async (req, res) => {
         const { nombre, apellido, email, password } = req.body;
-        console.log(req.body)
-        // Validaciones básicas
+
         if (!nombre || !apellido || !email || !password) {
             return res.redirect('/register?error=Todos los campos son obligatorios.');
         }
 
         try {
-            // Genera un hash de la contraseña
-            const saltRounds = 10; // Número de rondas de sal para bcrypt (más alto = más seguro, más lento)
-            const password_hash = await bcrypt.hash(password, saltRounds);
+            // 1. Verificar si el email ya existe en la tabla 'usuarios'
+            const existingUser = await UserModel.findByEmail(email);
+            if (existingUser) {
+                return res.redirect('/register?error=El correo electrónico ya está registrado.');
+            }
 
-            // Inserta el nuevo usuario en la base de datos
-            const [result] = await db.execute(
-                'INSERT INTO Usuarios2 (nombre, apellido, email, password_hash) VALUES (?, ?, ?, ?)',
-                [nombre, apellido, email, password_hash]
-            );
+            // 2. Crear el nuevo usuario en la tabla 'usuarios'
+            const newUserId = await UserModel.create(email);
+            if (!newUserId) {
+                throw new Error('Error al crear el usuario principal.');
+            }
 
-            // Opcional: Iniciar sesión automáticamente después del registro
-            req.session.user = { id: result.insertId, email: email };
+            // 3. Hashear la contraseña
+            const saltRounds = 10;
+            const passwordHash = await bcrypt.hash(password, saltRounds);
+
+            // 4. Crear las credenciales en la tabla 'credenciales'
+            const credentialsCreated = await CredentialModel.create(newUserId, passwordHash);
+            if (!credentialsCreated) {
+                // Si falla la creación de credenciales, puedes considerar deshacer la creación del usuario
+                // En un sistema real, esto se manejaría con transacciones.
+                throw new Error('Error al crear credenciales para el usuario.');
+            }
+
+            // 5. Crear el perfil en la tabla 'perfiles'
+            const profileCreated = await ProfileModel.create(newUserId, nombre, apellido);
+            if (!profileCreated) {
+                // Similarmente, considerar deshacer si el perfil no se crea
+                throw new Error('Error al crear el perfil del usuario.');
+            }
+
+            // Iniciar sesión automáticamente después del registro
+            req.session.user = { id: newUserId, email: email, nombre: nombre };
             res.redirect('/dashboard');
 
         } catch (error) {
             console.error('Error al registrar usuario:', error);
-            // Manejo de errores, por ejemplo, si el email ya existe (UNIQUE constraint)
-            if (error.code === 'ER_DUP_ENTRY') {
-                return res.redirect('/register?error=El correo electrónico ya está registrado.');
-            }
             res.redirect('/register?error=Error al registrar el usuario. Inténtalo de nuevo.');
         }
     },
 
-    // Maneja el envío del formulario de inicio de sesión
     postLogin: async (req, res) => {
         const { email, password } = req.body;
-        try {
-            // Busca el usuario por email en la base de datos
-            const [rows] = await db.execute('SELECT * FROM Usuarios2 WHERE email = ?', [email]);
-            const user = rows[0];
-            console.log(user)
-            if (user) {
-                // Si el usuario existe, compara la contraseña proporcionada con el hash almacenado
-                const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
-                if (passwordMatch) {
-                    // Si las contraseñas coinciden:
-                    // Almacena información no sensible del usuario en la sesión.
-                    req.session.user = { id: user.id, email: user.email, nombre: user.nombre };
-                    res.redirect('/dashboard'); // Redirige al dashboard
-                } else {
-                    // Contraseña incorrecta
-                    res.redirect('/?error=Credenciales inválidas. Inténtalo de nuevo.');
-                }
+        try {
+            // 1. Buscar el usuario por email en la tabla 'usuarios'
+            const user = await UserModel.findByEmail(email);
+            if (!user) {
+                return res.redirect('/?error=Credenciales inválidas. Inténtalo de nuevo.');
+            }
+
+            // 2. Buscar las credenciales del usuario en la tabla 'credenciales'
+            const credentials = await CredentialModel.findByUserId(user.id);
+            if (!credentials) {
+                // Esto no debería pasar si el registro es atómico
+                return res.redirect('/?error=Error de configuración de credenciales. Contacta al soporte.');
+            }
+
+            // 3. Comparar la contraseña proporcionada con el hash almacenado
+            const passwordMatch = await bcrypt.compare(password, credentials.password_hash);
+
+            if (passwordMatch) {
+                // 4. Si las contraseñas coinciden, buscar el perfil del usuario
+                const profile = await ProfileModel.findByUserId(user.id);
+
+                // Almacenar información relevante en la sesión (combinando usuario y perfil)
+                req.session.user = {
+                    id: user.id,
+                    email: user.email,
+                    nombre: profile ? profile.nombre : 'Usuario', // Usa nombre del perfil si existe
+                    apellido: profile ? profile.apellido : ''
+                };
+                res.redirect('/dashboard'); // Redirige al dashboard
             } else {
-                // Usuario no encontrado
                 res.redirect('/?error=Credenciales inválidas. Inténtalo de nuevo.');
             }
         } catch (error) {
@@ -90,17 +119,42 @@ const authController = {
         }
     },
 
-    // Maneja el cierre de sesión
     postLogout: (req, res) => {
-        // Destruye la sesión del usuario.
         req.session.destroy(err => {
             if (err) {
                 console.error('Error al destruir la sesión:', err);
                 return res.redirect('/dashboard');
             }
-            res.redirect('/'); // Redirige al formulario de inicio de sesión
+            res.redirect('/');
         });
     }
 };
 
 module.exports = authController;
+
+//Nota la redireccion LEER:
+
+/* No, la redirección en la función postLogin de controllers/authController.js no es siempre a donde vino la petición original (referente al "referer" del HTTP).
+
+La redirección en ese caso específico es explícita y estática:
+
+res.redirect('/dashboard');: Si el login es exitoso, el usuario siempre será redirigido a la ruta /dashboard.
+res.redirect('/?error=...');: Si el login falla, el usuario siempre será redirigido de vuelta a la ruta raíz (/), que es donde se encuentra el formulario de login, y se le pasará un mensaje de error como parámetro de consulta.
+¿Qué significa "de donde vino la petición"?
+Si te refieres a si se redirige a la URL que estaba visitando el usuario antes de llegar a la página de login (ej., si intentó acceder a /admin y fue redirigido al login), esa lógica no está implementada en el código actual.
+
+Para implementar eso (redirigir al usuario a la página que intentó visitar antes de ser interceptado por la autenticación), se suele hacer lo siguiente:
+
+Al interceptar la ruta protegida (isAuthenticated middleware):
+Guardar la URL original que el usuario intentó visitar en la sesión (ej., req.session.returnTo = req.originalUrl;).
+Luego, redirigir al / (login).
+En el postLogin exitoso:
+Después de un login exitoso, verificar si req.session.returnTo existe.
+Si existe, redirigir a req.session.returnTo y luego eliminar esa variable de la sesión.
+Si no existe, redirigir al /dashboard por defecto.
+En resumen:
+En el código actual:
+
+Éxito: Redirecciona siempre a /dashboard.
+Fallo: Redirecciona siempre a / (la página de login).
+No hay lógica para recordar y redirigir a la URL previa a la que el usuario fue interceptado por el middleware de autenticación. */

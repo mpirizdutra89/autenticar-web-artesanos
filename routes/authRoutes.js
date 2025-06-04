@@ -1,23 +1,28 @@
 // routes/authRoutes.js
-// Este archivo define las rutas relacionadas con la autenticación (login, logout, register).
-
 const express = require('express');
-const router = express.Router(); // Crea una nueva instancia de Express Router
-const authController = require('../controllers/authController'); // Importa el controlador de autenticación
+const router = express.Router();
+const authController = require('../controllers/authController');
 
-// Ruta GET para la página de inicio (formulario de inicio de sesión)
-router.get('/', authController.getLoginPage);
 
-// Ruta GET para la página de registro
-router.get('/register', authController.getRegisterPage);
 
-// Ruta POST para manejar el envío del formulario de registro
+
 router.post('/register', authController.postRegister);
 
-// Ruta POST para manejar el envío del formulario de inicio de sesión
 router.post('/login', authController.postLogin);
 
-// Ruta POST para cerrar sesión
 router.post('/logout', authController.postLogout);
 
-module.exports = router; // Exporta el router
+router.get('/register', authController.getRegisterPage);
+
+router.get('/', authController.getLoginPage);
+
+module.exports = router;
+
+
+//Notas de seguridad Para redi, cuando lo despligue en la vps.
+/* ¿Implicaciones de Seguridad?
+Esto significa que si la seguridad de tu servidor Redis se ve comprometida (por ejemplo, si un atacante obtiene acceso a tu servidor donde corre Redis), podría leer los datos de las sesiones de tus usuarios. Por lo tanto, es crucial:
+
+Asegurar tu servidor Redis: Configura contraseñas fuertes para Redis, restringe el acceso al puerto de Redis (6379) solo a tu aplicación Node.js y a las IPs de administración, y no lo expongas directamente a Internet.
+No almacenar información extremadamente sensible en la sesión: Para datos como contraseñas o números de tarjetas de crédito (que nunca deberían guardarse de forma legible en ningún sitio), no los guardes en la sesión. La sesión es para el estado de login y preferencias de usuario, no para datos bancarios.
+Así que, tu observación es muy pertinente. El SESSION_SECRET no encripta el contenido de la sesión guardado en Redis, sino que se centra en proteger la integridad y autenticidad del identificador de sesión que se envía en la cookie al cliente. */

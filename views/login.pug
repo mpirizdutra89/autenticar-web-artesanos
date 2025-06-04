@@ -1,10 +1,13 @@
-extends layout
+extends layout_prueba
 block content
     .container
         h2.text-3xl.font-bold.text-center.text-gray-800.mb-6 Iniciar Sesión
         if error
           h4(style='color:red;')=error
-        form(action="/login", method="POST")
+        - let pref=""
+        if prefijo 
+            - pref=prefijo + "login"
+        form(action=pref, method="POST")
             .mb-4
               label.block.text-gray-700.text-sm.font-bold.mb-2(for="email") Correo Electrónico:
               input(type="email", id="email", name="email", placeholder="tu@ejemplo.com", required)

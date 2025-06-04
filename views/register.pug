@@ -1,11 +1,14 @@
-extends layout
+extends layout_prueba
 
 block content
   .container
     h2.text-3xl.font-bold.text-center.text-gray-800.mb-6 Registrarse
     if error
       p.error-message= error
-    form(action="/register", method="POST")
+    - let pref=""
+    if prefijo 
+        - pref=prefijo + "register"
+    form(action=pref, method="POST")
         .mb-4
           label.block.text-gray-700.text-sm.font-bold.mb-2(for="nombre") Nombre:
           input(type="text", id="nombre", name="nombre", placeholder="Tu nombre", required)

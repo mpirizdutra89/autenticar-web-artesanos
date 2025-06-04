@@ -1,0 +1,9 @@
+extends layout_prueba
+block content
+  .container(style="max-width: 28rem; text-align: center;").mt-5
+    h2.text-3xl.font-bold.text-gray-800.mb-4 Acceso Denegado
+    p.text-gray-600.mb-8 No tienes permiso para acceder a esta página o realizar esta acción.
+    p.link-text
+      a(href="/usuario/login") Iniciar Sesión
+    p.link-text
+      a(href="/dashboard") Volver al Dashboard (si ya iniciaste sesión)

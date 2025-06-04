@@ -1,11 +1,8 @@
 // controllers/userController.js
-// Este archivo contiene la lógica para las operaciones relacionadas con el usuario (ej. dashboard).
-
+// No necesita muchos cambios, ya que los datos de perfil ya están en la sesión.
 const userController = {
-    // Renderiza la página del dashboard
     getDashboardPage: (req, res) => {
-        // Renderiza la plantilla 'dashboard.pug' y pasa el nombre de usuario de la sesión
-        // req.session.user ahora contiene más detalles del usuario de la DB
+        // Los datos del usuario (incluyendo nombre/apellido) ya están en req.session.user
         res.render('dashboard', { username: req.session.user.nombre || req.session.user.email });
     }
 };
