@@ -79,43 +79,69 @@ const authController = {
     },
 
     postLogin: async (req, res) => {
-        const { email, password } = req.body;
 
-        try {
-            // 1. Buscar el usuario por email en la tabla 'usuarios'
-            const user = await UserModel.findByEmail(email);
-            if (!user) {
-                return res.redirect('/?error=Credenciales inválidas. Inténtalo de nuevo.');
+        if (req.body) {
+
+            const { email, password } = req.body
+
+            const respuesta = {
+                ok: false,
+                data: null,
+                error: null,
+                url: '',
+                msj: "La credenciales son incorrectas."
             }
 
-            // 2. Buscar las credenciales del usuario en la tabla 'credenciales'
-            const credentials = await CredentialModel.findByUserId(user.id);
-            if (!credentials) {
-                // Esto no debería pasar si el registro es atómico
-                return res.redirect('/?error=Error de configuración de credenciales. Contacta al soporte.');
+            try {
+                //console.log(req.body)
+                // 1. Buscar el usuario por email en la tabla 'usuarios'
+                const user = await UserModel.findByEmail(email);
+
+                if (!user) {
+                    res.status(401).json(respuesta);
+                }
+
+                // 2. Buscar las credenciales del usuario en la tabla 'credenciales'
+                const credentials = await CredentialModel.findByUserId(user.id);
+                if (!credentials) {
+                    // Esto no debería pasar si el registro es atómico
+                    res.status(401).json(respuesta);
+                }
+
+                // 3. Comparar la contraseña proporcionada con el hash almacenado
+                const passwordMatch = await bcrypt.compare(password, credentials.password_hash);
+
+                if (passwordMatch) {
+                    // 4. Si las contraseñas coinciden, buscar el perfil del usuario
+                    const profile = await ProfileModel.findByUserId(user.id);
+
+                    // Almacenar información relevante en la sesión (combinando usuario y perfil)
+                    req.session.user = {
+                        id: user.id,
+                        email: user.email,
+                        nombre: profile ? profile.nombre : 'Usuario', // Usa nombre del perfil si existe
+                        apellido: profile ? profile.apellido : ''
+                    };
+                    respuesta.msj = `Sesion exitosa, bienvenido ${req.session.user.email}`
+                    respuesta.ok = true
+                    respuesta.url = '/dashboard'
+                    res.status(200).json(respuesta);
+                    //res.redirect('/dashboard'); // Redirige al dashboard
+                } else {
+
+                    res.status(401).json(respuesta);
+                }
+            } catch (error) {
+                console.error('Error al iniciar sesión Error de servidor catch:', error);
+
+                respuesta.msj = "Error en el servidor. Inténtalo de nuevo más tarde."
+
+                res.status(500).json(respuesta);
             }
+        } else {
+            respuesta.msj = "No llegan las credenciales"
 
-            // 3. Comparar la contraseña proporcionada con el hash almacenado
-            const passwordMatch = await bcrypt.compare(password, credentials.password_hash);
-
-            if (passwordMatch) {
-                // 4. Si las contraseñas coinciden, buscar el perfil del usuario
-                const profile = await ProfileModel.findByUserId(user.id);
-
-                // Almacenar información relevante en la sesión (combinando usuario y perfil)
-                req.session.user = {
-                    id: user.id,
-                    email: user.email,
-                    nombre: profile ? profile.nombre : 'Usuario', // Usa nombre del perfil si existe
-                    apellido: profile ? profile.apellido : ''
-                };
-                res.redirect('/dashboard'); // Redirige al dashboard
-            } else {
-                res.redirect('/?error=Credenciales inválidas. Inténtalo de nuevo.');
-            }
-        } catch (error) {
-            console.error('Error al iniciar sesión:', error);
-            res.redirect('/?error=Error en el servidor. Inténtalo de nuevo más tarde.');
+            res.status(401).json(respuesta);
         }
     },
 

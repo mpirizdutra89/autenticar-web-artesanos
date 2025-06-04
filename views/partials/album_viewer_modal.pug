@@ -1,0 +1,72 @@
+.modal.fade#albumViewerModal(tabindex="-1", aria-labelledby="albumViewerModalLabel", aria-hidden="true")
+    .modal-dialog.modal-xl.modal-dialog-centered
+        .modal-content.bg-dark
+            .modal-header.border-0.pb-0
+                h5.modal-title.text-white#albumViewerModalLabel
+                .d-flex.align-items-center
+                    button.btn.btn-outline-light.me-2#fullscreenToggleBtn(type="button", title="Pantalla Completa")
+                        i.bi.bi-arrows-fullscreen
+                    button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Close")
+            .modal-body.p-0.d-flex.flex-column
+                .carousel-container.flex-grow-1.d-flex.flex-column.justify-content-center.align-items-center#carouselContainer
+                    #albumCarousel.carousel.slide(data-bs-ride="carousel")
+                        .carousel-indicators
+                            // Los indicadores se generarán dinámicamente o se crearán para el ejemplo
+                            button(type="button", data-bs-target="#albumCarousel", data-bs-slide-to="0", class="active", aria-current="true", aria-label="Slide 1")
+                            button(type="button", data-bs-target="#albumCarousel", data-bs-slide-to="1", aria-label="Slide 2")
+                            button(type="button", data-bs-target="#albumCarousel", data-bs-slide-to="2", aria-label="Slide 3")
+                            button(type="button", data-bs-target="#albumCarousel", data-bs-slide-to="3", aria-label="Slide 4")
+                            button(type="button", data-bs-target="#albumCarousel", data-bs-slide-to="4", aria-label="Slide 5")
+                            button(type="button", data-bs-target="#albumCarousel", data-bs-slide-to="5", aria-label="Slide 6")
+
+                        .carousel-inner
+                            // Obras del álbum - SIMULACIÓN
+                            // Las rutas de las imágenes deben ser relativas a la carpeta public
+                            .carousel-item.active(data-work-id="1")
+                                img.d-block.w-100(src="/img/1.jpg", alt="Obra 1")
+                                .carousel-caption.d-block
+                                    h5.work-title Atardecer en la Montaña
+                                    p.work-description Una toma sublime del sol poniéndose sobre los picos.
+                            .carousel-item(data-work-id="2")
+                                img.d-block.w-100(src="/img/2.jpg", alt="Obra 2")
+                                .carousel-caption.d-block
+                                    h5.work-title El Silencio Urbano
+                                    p.work-description Capturando la quietud en medio del bullicio de la ciudad.
+                            .carousel-item(data-work-id="3")
+                                img.d-block.w-100(src="/img/3.jpg", alt="Obra 3")
+                                .carousel-caption.d-block
+                                    h5.work-title Danza de las Sombras
+                                    p.work-description Juego de luces y sombras en una arquitectura minimalista.
+                            .carousel-item(data-work-id="4")
+                                img.d-block.w-100(src="/img/4.jpg", alt="Obra 4")
+                                .carousel-caption.d-block
+                                    h5.work-title Retrato Pensativo
+                                    p.work-description Profundizando en la mirada de un alma reflexiva.
+                            .carousel-item(data-work-id="5")
+                                img.d-block.w-100(src="/img/5.jpg", alt="Obra 5")
+                                .carousel-caption.d-block
+                                    h5.work-title Reflejos Acuáticos
+                                    p.work-description La belleza de la naturaleza reflejada en un lago sereno.
+                            .carousel-item(data-work-id="6")
+                                img.d-block.w-100(src="/img/6.jpg", alt="Obra 6")
+                                .carousel-caption.d-block
+                                    h5.work-title Explosión Cromática
+                                    p.work-description Cuando el color se convierte en la única forma de expresión.
+                        button.carousel-control-prev(type="button", data-bs-target="#albumCarousel", data-bs-slide="prev")
+                            span.carousel-control-prev-icon(aria-hidden="true")
+                            span.visually-hidden Previous
+                        button.carousel-control-next(type="button", data-bs-target="#albumCarousel", data-bs-slide="next")
+                            span.carousel-control-next-icon(aria-hidden="true")
+                            span.visually-hidden Next
+                // Sección de Comentarios
+                .comments-section.bg-light
+                    h6.text-section-title.mb-3 Comentarios de la Obra:
+                        span#currentWorkCommentsTitle
+                    #commentsList.comments-list
+                        .no-comments-message
+                            i.bi.bi-chat-dots
+                            p Sé el primero en comentar esta obra.
+                    form#addCommentForm.add-comment-form
+                        .mb-2
+                            textarea.form-control#commentText(rows="2", placeholder="Escribe tu comentario...", required)
+                        button.btn.btn-sm.btn-custom-primary(type="submit") Enviar Comentario

@@ -1,0 +1,54 @@
+// views/partials/profile_offcanvas.pug
+// Offcanvas para "Mi Perfil"
+.offcanvas.offcanvas-end(tabindex="-1", id="profileOffcanvas", aria-labelledby="profileOffcanvasLabel")
+    .offcanvas-header
+        h5.offcanvas-title#profileOffcanvasLabel
+            i.bi.bi-person-circle.me-2
+            | Mi Perfil
+        button.btn-close.text-reset.btn-close-white(type="button", data-bs-dismiss="offcanvas", aria-label="Close")
+    .offcanvas-body
+        .profile-header
+            img.profile-avatar(src="/img/image_3949cf.png", alt="Avatar de Artista")
+            .profile-info
+                h4 ArtistaEjemplo
+                p.text-muted Fotógrafo y Pintor | San Luis, Argentina
+                button.btn.btn-sm.btn-outline-custom-primary.mt-2 Editar Perfil
+
+        h6.text-section-title.mb-3 Información Personal
+        .mb-3
+            label.form-label-offcanvas(for="profileName") Nombre Completo
+            input.form-control#profileName(type="text", value="Juan Pérez", disabled)
+        .mb-3
+            label.form-label-offcanvas(for="profileEmail") Correo Electrónico
+            input.form-control#profileEmail(type="email", value="artista.ejemplo@email.com", disabled)
+        .mb-3
+            label.form-label-offcanvas(for="profileBio") Biografía
+            textarea.form-control#profileBio(rows="4", disabled) Apasionado por la captura de la belleza en lo cotidiano. Mi trabajo busca explorar la interacción entre la luz, la sombra y la emoción en paisajes urbanos y retratos.
+        .mb-3
+            label.form-label-offcanvas(for="profileWebsite") Sitio Web / Portfolio
+            input.form-control#profileWebsite(type="url", value="https://www.misitioartista.com", disabled)
+
+        h6.text-section-title.mb-3.mt-4 Redes Sociales
+        .mb-2
+            label.form-label-offcanvas(for="profileInstagram")
+                i.bi.bi-instagram.me-2
+                | Instagram
+            input.form-control#profileInstagram(type="text", value="@artista_ejemplo", disabled)
+        .mb-2
+            label.form-label-offcanvas(for="profileFacebook")
+                i.bi.bi-facebook.me-2
+                | Facebook
+            input.form-control#profileFacebook(type="text", value="ArtistaEjemploOficial", disabled)
+        .mb-2
+            label.form-label-offcanvas(for="profileTwitter")
+                i.bi.bi-twitter-x.me-2
+                | Twitter
+            input.form-control#profileTwitter(type="text", value="@artista_ejemplo", disabled)
+        .mb-2
+            label.form-label-offcanvas(for="profileLinkedIn")
+                i.bi.bi-linkedin.me-2
+                | LinkedIn
+            input.form-control#profileLinkedIn(type="text", value="JuanPerezArtista", disabled)
+
+        .d-grid.gap-2.mt-4
+            button.btn.btn-custom-primary(type="button") Guardar Cambios

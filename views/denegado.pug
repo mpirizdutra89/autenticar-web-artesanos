@@ -1,0 +1,11 @@
+extends layout_publico
+block content
+     .container-fluid.bg-light
+            .row
+                  .col-md-6.offset-md-3.text-center.py-5
+                        img(src="/img/recursos/denegado.png", alt="denegado").img-fluid
+                        if msj
+                            p.lead #{msj}
+                        else 
+                            p.lead No tiene acceso a esta pagina.
+                        a(href="/").btn.btn-secondary Volver al inicio

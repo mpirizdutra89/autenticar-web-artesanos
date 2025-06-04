@@ -13,17 +13,21 @@ const { Server } = require('socket.io'); // Importa la clase Server de socket.io
 const { createAdapter } = require('@socket.io/redis-adapter'); // Importa el adaptador de Redis
 
 // Importa los módulos de rutas
+const inicioRoutes = require('./routes/inicio');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // Importa el middleware de autenticación
-const isAuthenticated = require('./middleware/authMiddleware');
+const { isAuthenticated, loadUserIntoView } = require('./middleware/authMiddleware');
 
 const app = express();
 const port = 3000;
 
+app.use(express.static(path.join(__dirname, 'public')))
+app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
+app.use('/bootstrap-icons', express.static(path.join(__dirname, 'node_modules/bootstrap-icons/font')))// Esto expone la carpeta 'node_modules/bootstrap-icons/font' bajo la ruta '/bootstrap-icons'
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(express.json());
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -74,10 +78,16 @@ app.set('views', path.join(__dirname, 'views'));
         process.exit(1);
     }
 
-    // Rutas de autenticación (login, logout, register)
-    app.use('/usuario', authRoutes);
+    // APLICA EL MIDDLEWARE loadUserIntoView GLOBALMENTE
+    // Esto hace que `res.locals.user` esté disponible en todas las vistas.
+    app.use(loadUserIntoView);
+
+    app.use('/usuario', authRoutes);// Rutas de autenticación (login, logout, register)
     // Rutas del dashboard (protegidas por el middleware isAuthenticated)
     app.use('/dashboard', isAuthenticated, dashboardRoutes);
+
+    app.use('/', inicioRoutes);
+
     // Este middleware debe ir DESPUÉS de TODAS tus rutas definidas
     app.use((req, res, next) => {
 

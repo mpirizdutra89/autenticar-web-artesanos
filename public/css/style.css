@@ -1,0 +1,616 @@
+/* public/css/style.css */
+
+/* Definición de colores en :root */
+:root {
+    --bs-body-bg: #f8f9fa;
+    --bs-navbar-bg: #212529;
+    --bs-navbar-text: #ffffff;
+    --bs-navbar-text-hover: #dee2e6;
+    --bs-primary-custom: #fd7e14;
+    --bs-primary-custom-hover: #e66a0d;
+    --bs-li-custom-hover:#313435;
+    --bs-outline-custom-primary: #fd7e14;
+    --bs-outline-custom-primary-text: #fd7e14;
+    --bs-hero-bg: #e9ecef;
+    --bs-card-shadow: rgba(0, 0, 0, 0.1);
+
+    --bs-tab-active-bg: var(--bs-primary-custom);
+    --bs-tab-active-text: var(--bs-navbar-text);
+    --bs-tab-inactive-bg: #e9ecef;
+    --bs-tab-inactive-text: #495057;
+}
+
+body {
+    background-color: var(--bs-body-bg);
+    position: relative;
+    min-height: 100vh;
+}
+
+.navbar-custom {
+    background-color: var(--bs-navbar-bg);
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+    color: var(--bs-navbar-text);
+}
+
+.navbar-custom .nav-link:hover {
+    color: var(--bs-navbar-text-hover);
+}
+.navbar-custom .dropdown-menu {
+    background-color: var(--bs-navbar-bg);
+    border-color: #343a40;
+}
+.navbar-custom .dropdown-item {
+     color: var(--bs-navbar-text);
+}
+.navbar-custom .dropdown-item:hover {
+    background-color: var(--bs-li-custom-hover); 
+    color: var(--bs-navbar-text); 
+}
+
+.navbar-custom .dropdown-header {
+    color: var(--bs-navbar-text-hover);
+}
+.navbar-custom .dropdown-divider {
+    border-top-color: #495057;
+}
+
+.btn-custom-primary {
+    background-color: var(--bs-primary-custom);
+    border-color: var(--bs-primary-custom);
+    color: var(--bs-navbar-text);
+}
+
+.btn-custom-primary:hover {
+    background-color: var(--bs-primary-custom-hover);
+    border-color: var(--bs-primary-custom-hover);
+    color: var(--bs-navbar-text);
+}
+
+.btn-outline-custom-primary {
+    color: var(--bs-outline-custom-primary-text);
+    border-color: var(--bs-outline-custom-primary);
+}
+
+.btn-outline-custom-primary:hover {
+    background-color: var(--bs-primary-custom);
+    color: var(--bs-navbar-text);
+}
+
+.hero-section {
+    background-color: var(--bs-hero-bg);
+    padding: 40px 0;
+    border-radius: .5rem;
+}
+
+.card-img-top-fit {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.card-img-portfolio {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.card.shadow-sm {
+    box-shadow: 0 .125rem .25rem var(--bs-card-shadow) !important;
+}
+
+.modal-header.bg-dark {
+    background-color: var(--bs-navbar-bg) !important;
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.btn-float-bottom-right {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    padding: 15px 25px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px var(--bs-card-shadow);
+}
+
+.nav-tabs .nav-link {
+    color: var(--bs-tab-inactive-text);
+    background-color: var(--bs-tab-inactive-bg);
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: 5px;
+}
+.nav-tabs .nav-link.active {
+    color: var(--bs-tab-active-text);
+    background-color: var(--bs-tab-active-bg);
+    border-color: var(--bs-tab-active-bg);
+    font-weight: bold;
+}
+.nav-tabs .nav-link:hover:not(.active) {
+    background-color: #e2e6ea;
+    color: #212529;
+}
+.tab-content {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    padding: 20px;
+    border-bottom-left-radius: .5rem;
+    border-bottom-right-radius: .5rem;
+    border-top-right-radius: .5rem;
+}
+.text-section-title {
+    color: #343a40;
+}
+
+
+ .notifications-dropdown-menu {
+    max-height: 400px; 
+    overflow-y: auto; 
+    width: 350px; 
+    left: auto !important; 
+    right: 0; 
+    border-radius: 0.5rem; 
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175); 
+    background-color: var(--bs-navbar-bg); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+/* Encabezado del dropdown */
+.notifications-dropdown-menu .dropdown-header {
+    font-weight: bold;
+    padding: 1rem 1.5rem; /* Aumenta el padding */
+    font-size: 1.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+    color: var(--bs-navbar-text); 
+}
+
+/* Líneas divisorias internas */
+.notifications-dropdown-menu .dropdown-divider {
+    border-top-color: rgba(255, 255, 255, 0.05);
+    margin: 0; 
+}
+
+/* Ítems individuales de notificación */
+.notifications-dropdown-item {
+    padding: 1rem 1.5rem; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+    white-space: normal; 
+    color: var(--bs-navbar-text); 
+    transition: background-color 0.2s ease; 
+    align-items: flex-start !important; 
+}
+
+
+
+.notifications-dropdown-item:last-of-type { 
+    border-bottom: none;
+}
+
+/* Iconos de las notificaciones */
+.notifications-dropdown-item .notification-icon {
+    font-size: 1.8rem; 
+    margin-right: 1rem; 
+    flex-shrink: 0; 
+    color: var(--bs-primary-custom); 
+}
+
+/* Contenedor de información de la notificación */
+.notifications-dropdown-item .notification-info {
+    flex-grow: 1; /* Permite que la información ocupe el espacio restante */
+    display: flex; /* Convierte en flex para control interno */
+    flex-direction: column; /* Apila el contenido verticalmente */
+}
+
+/* Títulos y textos dentro de la notificación */
+.notifications-dropdown-item p {
+    margin-bottom: 0.25rem; /* Menor margen entre título y descripción */
+    line-height: 1.4; /* Mejora la legibilidad */
+}
+
+.notifications-dropdown-item p strong {
+    color: var(--bs-primary-custom); /* Destaca el nombre de usuario */
+}
+
+.notifications-dropdown-item small.text-muted {
+    font-size: 0.8em; /* Un poco más pequeño */
+    color: rgba(255, 255, 255, 0.6) !important; /* Gris claro para texto mutado */
+}
+
+/* Contenedor de botones (Aceptar/Rechazar) */
+.notifications-dropdown-item .d-flex.justify-content-end {
+    margin-top: 0.5rem; /* Margen superior para separar de la descripción */
+    gap: 0.5rem; /* Espacio entre los botones */
+}
+
+/* Botones de acción (Aceptar/Rechazar) */
+.notifications-dropdown-item .btn {
+    font-size: 0.8rem; /* Más pequeños */
+    padding: 0.25rem 0.75rem; /* Padding ajustado */
+    border-radius: 0.3rem; /* Bordes ligeramente redondeados */
+    flex-shrink: 0; /* Evita que los botones se encojan */
+}
+
+/* Enlace "Ver Comentario" */
+.notifications-dropdown-item .notification-info .text-warning {
+    font-size: 0.9em; /* Un poco más pequeño que el texto normal */
+    text-decoration: none; /* Elimina subrayado por defecto */
+    margin-top: 0.5rem; /* Espacio para separarlo */
+    display: block; /* Para que ocupe su propia línea si es necesario */
+    text-align: right; /* Alinea a la derecha */
+    transition: color 0.2s ease; /* Transición suave al pasar el mouse */
+}
+
+.notifications-dropdown-item .notification-info .text-warning:hover {
+    color: var(--bs-navbar-text-hover); /* Cambia de color al pasar el mouse */
+}
+
+/* Último ítem: "Ver todas las notificaciones" */
+.notifications-dropdown-menu li:last-child .dropdown-item {
+    font-weight: bold;
+    padding: 1rem 1.5rem; /* Un poco más de padding */
+    text-align: center;
+    color: var(--bs-primary-custom); /* Color del link */
+    border-bottom: none; /* Asegura que no tenga borde inferior */
+}
+
+.notifications-dropdown-menu li:last-child .dropdown-item:hover {
+    background-color: var(--bs-li-custom-hover);
+    color: var(--bs-navbar-text);
+}
+.badge {
+        top: -4px;
+        left: 10px;
+}
+
+#albumViewerModal .modal-dialog {
+    max-width: 90vw;
+    transition: all 0.3s ease-in-out;
+}
+#albumViewerModal .carousel-item img {
+    max-height: 70vh;
+    object-fit: contain;
+    width: 100%;
+}
+#albumViewerModal .carousel-caption {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 5px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    z-index: 10;
+    display: none !important;
+}
+
+#albumViewerModal.fullscreen .modal-dialog {
+    margin: 0;
+    max-width: 100vw;
+    height: 100vh;
+}
+#albumViewerModal.fullscreen .modal-content {
+    height: 100%;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+}
+#albumViewerModal.fullscreen .carousel-item img {
+    max-height: 100vh;
+    object-fit: contain;
+}
+#albumViewerModal.fullscreen .modal-header {
+    position: relative;
+    top: unset;
+    left: unset;
+    right: unset;
+    z-index: 1056;
+    background-color: var(--bs-navbar-bg) !important;
+    border-bottom: none;
+    flex-shrink: 0;
+}
+#albumViewerModal.fullscreen .modal-body {
+    overflow: hidden;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+}
+#albumViewerModal.fullscreen .carousel-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: black;
+}
+#albumViewerModal.fullscreen .carousel-item {
+    height: 100%;
+}
+#albumViewerModal.fullscreen .carousel-item img {
+    height: 100%;
+}
+#albumViewerModal.fullscreen .comments-section {
+    position: relative;
+    bottom: unset;
+    left: unset;
+    right: unset;
+    background-color: var(--bs-navbar-bg);
+    border-top: 1px solid #343a40;
+    flex-shrink: 0;
+    padding: 15px;
+    color: white;
+    max-height: 25vh;
+    overflow-y: auto;
+}
+#albumViewerModal.fullscreen .comments-section .text-section-title {
+    color: white;
+}
+#albumViewerModal.fullscreen .comments-section .comment-author {
+    color: var(--bs-primary-custom);
+}
+#albumViewerModal.fullscreen .comments-section .comment-date,
+#albumViewerModal.fullscreen .comments-section .comment-text,
+#albumViewerModal.fullscreen .comments-section .no-comments-message p,
+#albumViewerModal.fullscreen .comments-section .no-comments-message i {
+    color: var(--bs-navbar-text-hover);
+}
+
+
+.offcanvas {
+    background-color: var(--bs-body-bg);
+}
+.offcanvas-header {
+    background-color: var(--bs-navbar-bg);
+    color: var(--bs-navbar-text);
+    border-bottom: 1px solid #343a40;
+}
+.offcanvas-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+.offcanvas-body {
+    padding: 20px;
+}
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bs-primary-custom);
+    margin-bottom: 15px;
+}
+.profile-info h4 {
+    color: var(--bs-navbar-bg);
+}
+.profile-info p {
+    color: #6c757d;
+}
+.form-label-offcanvas {
+    font-weight: bold;
+    color: #343a40;
+}
+.card-settings {
+    border: 1px solid #e9ecef;
+    border-radius: .5rem;
+    margin-bottom: 20px;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+#manageAlbumWorksModal .modal-dialog {
+    max-width: 800px;
+}
+#manageAlbumWorksModal .modal-body {
+    overflow-y: auto;
+    max-height: 70vh;
+}
+.work-thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: .25rem;
+    margin-right: 15px;
+}
+.work-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.work-item:last-child {
+    border-bottom: none;
+}
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.comments-section {
+    background-color: #f1f1f1;
+    padding: 15px;
+    border-top: 1px solid #e9ecef;
+    max-height: 300px;
+    overflow-y: auto;
+    color: #343a40;
+}
+.comments-list {
+    margin-bottom: 15px;
+}
+.comment-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+.comment-item:last-child {
+    border-bottom: none;
+}
+.comment-author {
+    font-weight: bold;
+    color: var(--bs-primary-custom);
+    margin-right: 5px;
+}
+.comment-date {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+.comment-text {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+.add-comment-form {
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+.no-comments-message {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+#loggedInNavbar .search-form {
+    /* Puedes ajustar estos valores según necesites */
+    min-width: 250px; /* Un ancho mínimo para el formulario de búsqueda */
+    /* O si quieres que el input sea más largo dentro del form: */
+    /* .search-form input {
+        min-width: 200px;
+    } */
+}
+
+/* Si quieres que ocupe un porcentaje específico del ancho disponible en pantallas grandes */
+@media (min-width: 992px) { /* lg breakpoint de Bootstrap */
+    #loggedInNavbar .search-form {
+        flex-basis: 300px; /* Define el tamaño base del elemento flex */
+        flex-grow: 1; /* Permite que crezca desde esa base */
+        max-width: 400px; /* Opcional: para que no sea demasiado largo */
+    }
+}
+@media (max-width: 980px){
+    #Notificacion-perfil-usuario{
+        margin-top: 15px;
+        float: right;
+    }
+}
+
+
+.profile-pic {
+    width: 36px; /* Ajusta el tamaño según tu preferencia */
+    height: 36px; /* Asegura que sea cuadrada para un círculo perfecto */
+    border-radius: 50%; /* Hace la imagen circular */
+    object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+    border: 1px solid #dee2e6; /* Opcional: un pequeño borde para que resalte */
+}
+
+/* Ajuste para que el texto "ArtistaEjemplo" se alinee bien verticalmente */
+/* Esto puede ser necesario si la imagen hace que la línea base cambie */
+.navbar .dropdown .nav-link {
+    display: flex;
+    align-items: center; /* Centra verticalmente la imagen y el texto */
+}
+
+/* Puede que necesites ajustar el margen del texto si la imagen lo desplaza mucho */
+.navbar .dropdown .nav-link .profile-pic + span { /* Selecciona el span directamente después de la imagen */
+    margin-left: 0.25rem; /* Pequeño margen entre imagen y texto, ajusta si ya tienes me-1 en la imagen */
+}
+
+/* public/css/style.css */
+
+/* ... (tus variables :root y otros estilos existentes) ... */
+
+/* --- Efecto "Glitch Electrónico" para el H1 (Colores Optimizados para fondo oscuro) --- */
+.glitch-effect {
+    color: var(--bs-primary-custom); /* Color inicial: Tu naranja personalizado */
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out, text-shadow 0.3s ease-in-out;
+    
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* Pseudo-elementos para crear las capas del efecto glitch */
+.glitch-effect::before,
+.glitch-effect::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    transition: transform 0.1s ease-in-out;
+}
+
+.glitch-effect::before {
+    color: var(--bs-primary-custom); /* Color inicial, igual que el texto principal */
+    transform: translate(2px, 0);
+    text-shadow: -1px 0 0 rgba(0, 200, 255, 0.7); /* Azul eléctrico/Cian (más brillante) */
+    animation: glitch-susto 0.5s infinite alternate ease-in-out;
+}
+
+.glitch-effect::after {
+    color: var(--bs-primary-custom); /* Color inicial, igual que el texto principal */
+    transform: translate(-2px, 0);
+    text-shadow: 1px 0 0 rgba(255, 0, 180, 0.7); /* Rosa/Magenta vibrante */
+    animation: glitch-susto-reverse 0.5s infinite alternate ease-in-out;
+}
+
+/* Efecto al pasar el mouse (hover) */
+.glitch-effect:hover {
+    color: var(--bs-navbar-bg); /* Cambia el color del texto principal a blanco puro o gris claro */
+    transform: skewX(-5deg); /* Inclinación sutil */
+    /* Sombras más pronunciadas y en colores complementarios al naranja, o RGB para un "fallo" clásico */
+    text-shadow:
+        3px 0 0 rgba(255, 0, 0, 0.8),    /* Rojo más fuerte */
+        -3px 0 0 rgba(0, 255, 0, 0.8),   /* Verde más fuerte */
+        0 3px 0 rgba(0, 0, 255, 0.8),    /* Azul más fuerte */
+        0 0 15px rgba(253, 126, 20, 0.5); /* Agrega un brillo sutil con tu color principal */
+}
+
+.glitch-effect:hover::before {
+    color: rgba(0, 255, 255, 0.8); /* Capa azul/cian al hover */
+    transform: translate(5px, 0);
+    text-shadow: -5px 0 0 rgba(255, 0, 180, 0.8); /* Sombra magenta */
+    animation: none;
+}
+
+.glitch-effect:hover::after {
+    color: rgba(255, 0, 180, 0.8); /* Capa rosa/magenta al hover */
+    transform: translate(-5px, 0);
+    text-shadow: 5px 0 0 rgba(0, 255, 255, 0.8); /* Sombra azul/cian */
+    animation: none;
+}
+
+/* Animaciones @keyframes (sin cambios, ya que definen el movimiento, no el color) */
+@keyframes glitch-susto {
+    0% { transform: translate(0); }
+    25% { transform: translate(-1px, 1px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(-1px, -1px); }
+    100% { transform: translate(0); }
+}
+
+@keyframes glitch-susto-reverse {
+    0% { transform: translate(0); }
+    25% { transform: translate(1px, -1px); }
+    50% { transform: translate(-1px, 1px); }
+    75% { transform: translate(1px, 1px); }
+    100% { transform: translate(0); }
+}

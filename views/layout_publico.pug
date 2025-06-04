@@ -1,0 +1,99 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    if title
+      title #{title}
+    else 
+      title Artesanos
+    link(rel="shortcut icon", href="img/icon/favicon.png", type="image/x-icon")
+    link(href="/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+    link(rel="stylesheet", href="/bootstrap-icons/bootstrap-icons.min.css")
+    link(rel="stylesheet", href="/css/style.css") 
+    
+    
+  body
+    nav.navbar.navbar-expand-lg.sticky-top.navbar-custom
+      .container-fluid
+        a.navbar-brand(href="/") Artesanos
+        button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#loggedInNavbar", aria-controls="loggedInNavbar", aria-expanded="false", aria-label="Toggle navigation")
+          span.navbar-toggler-icon.text-bg-light
+        .collapse.navbar-collapse#loggedInNavbar.justify-content-between
+          .d-flex.align-items-center.search-form
+            form.d-flex.me-3.flex-grow-1
+              input.form-control.flex-grow-1.me-2(type="search", placeholder="Buscar álbumes, obras...", aria-label="Search")
+              button.btn.btn-outline-light(type="submit")
+                i.bi.bi-search
+          .d-flex.align-items-center#Notificacion-perfil-usuario
+            if user
+                .dropdown.me-3
+                  a.nav-link.position-relative(href="#", id="notificationsDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
+                    i.bi.bi-bell-fill.h4
+                    span.badge.bg-danger.rounded-pill.position-absolute.notification-badge#nrNotificacion 3
+                  ul.dropdown-menu.dropdown-menu-end.notifications-dropdown-menu(aria-labelledby="notificationsDropdown")
+                    h6.dropdown-header Notificaciones
+                    li
+                      hr.dropdown-divider
+                  
+                    li
+                      a.dropdown-item.d-flex.align-items-center.notifications-dropdown-item(href="#")
+                        i.bi.bi-person-plus-fill.text-primary.notification-icon
+                        .notification-info.flex-grow-1
+                          p.mb-1
+                            strong SofiaM
+                            |  te ha enviado una solicitud de amistad.
+                          .d-flex.justify-content-end.mt-2
+                            button.btn.btn-sm.btn-success.me-2 Aceptar
+                            button.btn.btn-sm.btn-danger Rechazar
+                    
+                    li
+                      a.dropdown-item.d-flex.align-items-center.notifications-dropdown-item(href="#")
+                        i.bi.bi-chat-text-fill.text-info.notification-icon
+                        .notification-info.flex-grow-1 
+                          p.mb-1
+                            strong RicardoV
+                            |  comentó en tu obra "El Silencio Urbano".
+                          small.text-muted "Me encanta cómo capturas la soledad..."
+                          .text-end.mt-1
+                          
+                            span.text-warning.cursor-pointer(onclick="window.location.href='#';")
+                    li
+                      hr.dropdown-divider
+                    li
+                      a.dropdown-item.text-center.text-warning(href="#") Ver todas las notificaciones
+
+                // Menú desplegable del perfil de usuario
+                .dropdown
+                  a.nav-link.dropdown-toggle(href="#", id="navbarDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
+                    img.profile-pic.me-1(src="/img/login/perfil.jpg", alt="Foto de Perfil de Usuario")
+                    | ArtistaEjemplo
+                  ul.dropdown-menu.dropdown-menu-end(aria-labelledby="navbarDropdown")
+                    li
+                      a.dropdown-item(href="#", data-bs-toggle="offcanvas", data-bs-target="#profileOffcanvas") Mi Perfil
+                    li
+                      a.dropdown-item(href="#", data-bs-toggle="offcanvas", data-bs-target="#settingsOffcanvas") Ajustes de Cuenta
+                    li
+                      hr.dropdown-divider
+                    li
+                      form(action="/usuario/logout", method="POST")
+                        button.dropdown-item(type="submit") Cerrar Sesión
+                      //a.dropdown-item(href="#") Cerrar Sesión
+
+            else
+              button.btn.btn-outline-custom-primary.me-2(type="button", data-bs-toggle="modal", data-bs-target="#loginModal")
+                | Iniciar Sesión
+              button.btn.btn-outline-custom-primary(type="button", data-bs-toggle="modal", data-bs-target="#registerModal")
+                | Registrarse
+    
+    main.container.my-4
+            block content
+
+    include ./partials/manage_publico_modal.pug
+        
+    script(src="/bootstrap/js/bootstrap.bundle.min.js")   
+    script(src="/js/global.js")
+
+   
+    block scripts
+

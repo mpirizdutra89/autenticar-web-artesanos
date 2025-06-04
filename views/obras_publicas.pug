@@ -1,0 +1,28 @@
+extends layout_publico
+block content 
+    .text-center.mb-5.hero-section
+          h1.display-4.fw-bold Bienvenidos
+          p.lead.text-muted Descubre obras de arte únicas y conecta con artistas de todo el mundo.
+          
+    .row
+        .col-12.mb-4
+            h2.mb-4.text-center Portafolios Destacados
+            .row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4
+              .col
+                .card.h-100.shadow-sm
+                  img.card-img-top.card-img-top-fit(src="img/1.jpg", alt="Obra de Arte")
+                  .card-body
+                      h5.card-title &quot;Atardecer en la Montaña&quot;
+                      p.card-text.text-muted.mb-2
+                        small Artista: Sofía Márquez
+                      p.card-text
+                        | Una vibrante pintura al óleo que captura la esencia de la
+                        | naturaleza.
+                      
+                      button(type="button" class="btn btn-sm btn-outline-custom-primary"
+                                        data-bs-toggle="modal" data-bs-target="#albumViewerModal"
+                                        data-album-id="acaVa_eldiDELalumbum") Ver Portafolio
+            
+            
+block scripts
+    script(src="/js/public.js")

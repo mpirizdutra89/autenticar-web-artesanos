@@ -7,7 +7,7 @@ const getDashboard = async (req, res) => {
     const user = req.session.user;
 
     if (!user) {
-        return res.redirect('/usuario/login');
+        return res.redirect('/usuario/');
     }
 
     let notificacionesNoLeidas = [];

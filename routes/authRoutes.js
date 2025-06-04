@@ -3,12 +3,15 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
+const { loginValidationRules, registerValidationRules } = require('../validation/authValidation');
+// Importar el middleware que maneja los resultados de la validación
+const validate = require('../middleware/validatorMiddleware');
 
 
 
-router.post('/register', authController.postRegister);
+router.post('/register', registerValidationRules(), validate, authController.postRegister);
 
-router.post('/login', authController.postLogin);
+router.post('/login', loginValidationRules(), validate, authController.postLogin);
 
 router.post('/logout', authController.postLogout);
 

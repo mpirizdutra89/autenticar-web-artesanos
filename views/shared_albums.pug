@@ -1,0 +1,34 @@
+extends layout
+block content
+    .tab-pane.fade.show.active#shared-albums(role="tabpanel", aria-labelledby="shared-albums-tab") 
+      h3.mb-4.text-center.text-section-title Álbumes Compartidos Contigo
+      .row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4
+        .col
+          .card.h-100.shadow-sm
+            img.card-img-top.card-img-top-fit(src="img/share1.jpg", alt="Portada de Álbum Compartido")
+            .card-body.d-flex.flex-column
+              h5.card-title ArtistaEjemplo y RicardoV: Colores Urbanos
+              p.card-text.text-muted.mb-2
+                small 7 Obras | Compartido por: RicardoV
+              p.card-text.mb-auto 
+                | Una colaboración explorando los matices de la vida en la ciudad.
+              .d-flex.justify-content-between.align-items-center.mt-3
+                button.btn.btn-sm.btn-outline-custom-primary(type="button", data-bs-toggle="modal", data-bs-target="#albumViewerModal", data-album-id="sharedUrban") Ver Álbum
+                button.btn.btn-sm.btn-secondary(title="Dejar de seguir")
+                  i.bi.bi-person-x
+        .col
+          .card.h-100.shadow-sm
+            img.card-img-top.card-img-top-fit(src="img/share2.jpg", alt="Portada de Álbum Compartido")
+            .card-body.d-flex.flex-column
+              h5.card-title ArtistaEjemplo y ClaraL: Jardín Secreto
+              p.card-text.text-muted.mb-2
+                small 10 Obras | Compartido por: ClaraL
+              p.card-text.mb-auto 
+                | Pinturas botánicas inspiradas en la belleza oculta de la
+                | naturaleza.
+              .d-flex.justify-content-between.align-items-center.mt-3
+                button.btn.btn-sm.btn-outline-custom-primary(type="button", data-bs-toggle="modal", data-bs-target="#albumViewerModal", data-album-id="sharedGarden") Ver Álbum
+                button.btn.btn-sm.btn-secondary(title="Dejar de seguir")
+                  i.bi.bi-person-x
+        .col-12.text-center.py-5
+          p.text-muted Aún no hay álbumes compartidos contigo.

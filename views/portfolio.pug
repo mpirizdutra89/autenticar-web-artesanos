@@ -1,0 +1,53 @@
+extends layout
+block content 
+    
+    .tab-pane.fade.show.active#portfolio(role="tabpanel", aria-labelledby="portfolio-tab")
+        h3.mb-4.text-center.text-section-title Mi Portafolio Público
+        .d-flex.justify-content-between.align-items-center.mb-4
+            p.lead.text-muted.mb-0
+            | Selecciona las obras que quieres mostrar al mundo en tu portafolio
+            | público.
+            button.btn.btn-custom-primary(type="button", data-bs-toggle="modal", data-bs-target="#addWorkToPortfolioModal")
+                i.bi.bi-plus-lg.me-2
+                | Añadir Obra al Portafolio
+        .row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4
+            .col
+                .card.h-100.shadow-sm
+                    img.card-img-top.card-img-portfolio(src="img/1.jpg", alt="Obra en Portafolio")
+                    .card-body.d-flex.flex-column
+                        h5.card-title &quot;Atardecer en la Montaña&quot;
+                        p.card-text.text-muted.mb-2
+                            small Del Álbum: Mi Colección Urbana
+                        p.card-text.mb-auto 
+                            | Mi obra favorita por su composición y uso de la luz.
+                        .d-flex.justify-content-end.mt-3
+                           button.btn.btn-sm.btn-danger(title="Quitar del Portafolio")
+                                i.bi.bi-x-circle
+                                | Quitar
+            .col
+                .card.h-100.shadow-sm
+                    img.card-img-top.card-img-portfolio(src="img/5.jpg", alt="Obra en Portafolio")
+                    .card-body.d-flex.flex-column
+                        h5.card-title &quot;Retrato Íntimo&quot;
+                        p.card-text.text-muted.mb-2
+                            small Del Álbum: Retratos en la Naturaleza
+                        p.card-text.mb-auto 
+                            | Un estudio de la expresión humana a través del dibujo a lápiz.
+                        .d-flex.justify-content-end.mt-3
+                            button.btn.btn-sm.btn-danger(title="Quitar del Portafolio")
+                                i.bi.bi-x-circle
+                                | Quitar
+            .col
+                .card.h-100.shadow-sm
+                    img.card-img-top.card-img-portfolio(src="img/3.jpg", alt="Obra")
+                    .card-body.d-flex.flex-column
+                        h5.card-title &quot;Danza de las Sombras&quot;
+                        p.card-text.text-muted.mb-2
+                            small Del Álbum: Abstracción y Color
+                        p.card-text.mb-auto 
+                            | Escultura que explora las formas abstractas y su interacción con la
+                            | luz.
+                        .d-flex.justify-content-end.mt-3
+                            button.btn.btn-sm.btn-danger(title="Quitar del Portafolio")
+                                i.bi.bi-x-circle
+                                | Quitar

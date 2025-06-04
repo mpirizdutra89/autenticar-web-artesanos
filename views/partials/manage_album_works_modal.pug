@@ -1,0 +1,50 @@
+.modal.fade#manageAlbumWorksModal(tabindex="-1", aria-labelledby="manageAlbumWorksModalLabel", aria-hidden="true")
+    .modal-dialog.modal-lg.modal-dialog-centered
+        .modal-content
+            .modal-header.bg-dark.text-white
+                h5.modal-title#manageAlbumWorksModalLabel
+                    | Administrar Obras de:
+                    span#currentAlbumTitle
+                button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Close")
+            .modal-body
+                ul.nav.nav-pills.mb-3#pills-tab(role="tablist")
+                    li.nav-item(role="presentation")
+                        button.nav-link.active#pills-current-works-tab(type="button", data-bs-toggle="pill", data-bs-target="#pills-current-works", role="tab", aria-controls="pills-current-works", aria-selected="true")
+                            i.bi.bi-image-fill.me-2
+                            | Obras Actuales
+                    li.nav-item(role="presentation")
+                        button.nav-link#pills-add-works-tab(type="button", data-bs-toggle="pill", data-bs-target="#pills-add-works", role="tab", aria-controls="pills-add-works", aria-selected="false")
+                            i.bi.bi-plus-circle-fill.me-2
+                            | Añadir Obras
+                .tab-content#pills-tabContent
+                    // Pestaña: Obras Actuales
+                    .tab-pane.fade.show.active#pills-current-works(role="tabpanel", aria-labelledby="pills-current-works-tab")
+                        #currentWorksList
+                            // Las obras se cargarán aquí dinámicamente con JS
+                            .empty-state.d-none
+                                i.bi.bi-folder-x
+                                p Este álbum no tiene obras aún. ¡Añade algunas!
+
+                    // Pestaña: Añadir Obras
+                    .tab-pane.fade#pills-add-works(role="tabpanel", aria-labelledby="pills-add-works-tab")
+                        form
+                            .mb-3
+                                label.form-label(for="workUpload") Subir Archivos (Imágenes o Videos)
+                                input.form-control#workUpload(type="file", multiple, accept="image/*,video/*")
+                                small.form-text.text-muted Puedes seleccionar múltiples archivos a la vez.
+                            .mb-3
+                                label.form-label(for="workTitle") Título de la Obra (Opcional, se aplicará a todas si se sube una sola)
+                                input.form-control#workTitle(type="text", placeholder="Ej: Mi obra maestra")
+                            .mb-3
+                                label.form-label(for="workDescription") Descripción (Opcional)
+                                textarea.form-control#workDescription(rows="2", placeholder="Una breve descripción de tu obra...")
+                            button.btn.btn-custom-primary.w-100(type="submit") Subir Obras Seleccionadas
+
+                        hr.my-4
+
+                        h6.text-section-title.mb-3 Arrastrar y Soltar
+                        .border.border-dashed.border-2.p-5.text-center.text-muted.rounded
+                            i.bi.bi-cloud-arrow-up.display-4
+                            p Arrastra y suelta tus archivos aquí para subirlos
+            .modal-footer
+                button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar

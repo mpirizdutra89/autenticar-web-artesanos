@@ -1,0 +1,18 @@
+.modal.fade#createAlbumModal(tabindex="-1", aria-labelledby="createAlbumModalLabel", aria-hidden="true")
+    .modal-dialog
+        .modal-content
+            .modal-header.bg-dark.text-white
+                h5.modal-title#createAlbumModalLabel Crear/Editar Álbum
+                button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Close")
+            .modal-body
+                form
+                    .mb-3
+                        label.form-label(for="albumTitle") Título del Álbum
+                        input.form-control#albumTitle(type="text", placeholder="Ej: Mi primera colección")
+                    .mb-3
+                        label.form-label(for="albumDescription") Descripción
+                        textarea.form-control#albumDescription(rows="3", placeholder="Una breve descripción de tu álbum...")
+                    .mb-3
+                        label.form-label(for="albumCover") Subir Portada (Opcional)
+                        input.form-control#albumCover(type="file", accept="image/*")
+                    button.btn.btn-custom-primary.w-100(type="submit") Guardar Álbum

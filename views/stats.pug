@@ -1,0 +1,40 @@
+extends layout
+block content
+        .tab-pane.fade.show.active#stats(role="tabpanel", aria-labelledby="stats-tab")
+            h3.mb-4.text-center.text-section-title Estadísticas de tu Perfil y Obras
+            .row.g-4
+                .col-md-4
+                    .card.text-center.p-3.shadow-sm.h-100
+                        .card-body
+                        h4.card-title(style="color: var(--bs-primary-custom);") 12,345
+                        p.card-text.text-muted Vistas a tu Portafolio
+                .col-md-4
+                    .card.text-center.p-3.shadow-sm.h-100
+                        .card-body
+                        h4.card-title(style="color: var(--bs-primary-custom);") 987
+                        p.card-text.text-muted Me Gusta Totales
+                .col-md-4
+                    .card.text-center.p-3.shadow-sm.h-100
+                        .card-body
+                        h4.card-title(style="color: var(--bs-primary-custom);") 56
+                        p.card-text.text-muted Comentarios Recibidos
+                .col-12
+                    .card.p-3.shadow-sm
+                        .card-body
+                            h5.card-title.text-section-title Obras más Populares (últimos 30 días)
+                            ul.list-group.list-group-flush
+                                li.list-group-item.d-flex.justify-content-between.align-items-center
+                                    | &quot;Atardecer en la Montaña&quot;
+                                    span.badge.bg-primary.rounded-pill(style="background-color: var(--bs-primary-custom) !important;")
+                                        | 2,100
+                                        | vistas
+                                li.list-group-item.d-flex.justify-content-between.align-items-center
+                                    | &quot;Retrato Íntimo&quot;
+                                    span.badge.bg-primary.rounded-pill(style="background-color: var(--bs-primary-custom) !important;")
+                                        | 1,500
+                                        | vistas
+                                li.list-group-item.d-flex.justify-content-between.align-items-center
+                                    | &quot;Danza de las Sombras&quot;
+                                    span.badge.bg-primary.rounded-pill(style="background-color: var(--bs-primary-custom) !important;")
+                                        | 850
+                                        | vistas
