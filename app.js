@@ -33,7 +33,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // --- Función asíncrona autoejecutable para iniciar la aplicación ---
 (async () => {
-    // 1. Configuración y Conexión a Redis para SESSIONS (ya lo tienes)
+    // 1. Configuración y Conexión a Redis para SESSIONS
     let redisClient = createClient({
         url: process.env.REDIS_URL
     });
@@ -59,7 +59,7 @@ app.set('views', path.join(__dirname, 'views'));
         }
     }));
 
-    // --- NUEVA CONFIGURACIÓN DE SOCKET.IO CON REDIS ADAPTER ---
+
     // Clientes de Redis para el adaptador de Socket.IO (necesita dos clientes: pub y sub)
     const pubClient = createClient({ url: process.env.REDIS_URL });
     const subClient = createClient({ url: process.env.REDIS_URL });
@@ -97,7 +97,7 @@ app.set('views', path.join(__dirname, 'views'));
     });
 
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
-    // Ahora, creamos el servidor HTTP para que Socket.IO lo use
+
     const server = require('http').createServer(app);
     const io = new Server(server); // Conectar Socket.IO al servidor HTTP
 
@@ -163,4 +163,4 @@ app.set('views', path.join(__dirname, 'views'));
         console.log('🔗 Visita http://localhost:3000/usuario en tu navegador para iniciar la aplicación.');
         console.log('📝 Primero, regístrate en http://localhost:3000/usuario/register');
     });
-})(); // ¡Importante! La función se ejecuta automáticamente
+})(); // -> La función se ejecuta automáticamente

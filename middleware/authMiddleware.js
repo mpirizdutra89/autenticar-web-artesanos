@@ -5,7 +5,7 @@ function isAuthenticated(req, res, next) {
     } else {
         const ruta = req.originalUrl || ""
         const msj = `La ruta (${ruta}) a la que intentas acceder esta proteguida.`
-        console.log(referer)
+        console.log(ruta)
         res.render('denegado', {
             msj: msj,
             title: "Denegado"

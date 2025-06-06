@@ -66,7 +66,7 @@ html(lang="es")
                 // Menú desplegable del perfil de usuario
                 .dropdown
                   a.nav-link.dropdown-toggle(href="#", id="navbarDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
-                    img.profile-pic.me-1(src="/img/login/perfil.jpg", alt="Foto de Perfil de Usuario")
+                    img.profile-pic.me-1(src="/img/perfil_default/default.png", alt="Foto de Perfil de Usuario")
                     | ArtistaEjemplo
                   ul.dropdown-menu.dropdown-menu-end(aria-labelledby="navbarDropdown")
                     li
@@ -90,7 +90,9 @@ html(lang="es")
             block content
 
     include ./partials/manage_publico_modal.pug
-        
+    if user
+      include ./partials/profile_offcanvas.pug
+      include ./partials/settings_offcanvas.pug    
     script(src="/bootstrap/js/bootstrap.bundle.min.js")   
     script(src="/js/global.js")
 

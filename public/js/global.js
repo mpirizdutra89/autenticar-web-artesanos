@@ -11,71 +11,15 @@ const currentWorkCommentsTitle = document.getElementById('currentWorkCommentsTit
 const addCommentForm = document.getElementById('addCommentForm');
 const commentTextInput = document.getElementById('commentText');
 
-// Función para renderizar comentarios de una obra específica (ahora usa fetch)
-/* async function renderComments(workId) {
-    try {
-        const response = await fetch(`/api/works/${workId}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const work = await response.json();
-
-        if (!work) {
-            commentsList.innerHTML = `<div class="no-comments-message"><i class="bi bi-exclamation-circle"></i><p>Obra no encontrada.</p></div>`;
-            currentWorkCommentsTitle.textContent = "Obra Desconocida";
-            return;
-        }
-
-        currentWorkCommentsTitle.textContent = work.title;
-        commentsList.innerHTML = ''; // Limpiar comentarios anteriores
-
-        // Mostrar el título y la descripción de la obra en la sección de comentarios
-        const workInfoHtml = `
-            <h5 class="mb-1">${work.title}</h5>
-            <p class="text-muted small mb-3">${work.description}</p>
-            <hr class="my-2">
-        `;
-        // Insertar antes del commentsList pero después del h6 del título de comentarios
-        const commentsSectionTitle = commentsList.closest('.comments-section').querySelector('h6');
-        // Eliminar información de la obra anterior si existe
-        let existingWorkInfo = commentsSectionTitle.nextElementSibling;
-        while (existingWorkInfo && (existingWorkInfo.tagName === 'H5' || existingWorkInfo.tagName === 'P' || existingWorkInfo.tagName === 'HR')) {
-            const nextElement = existingWorkInfo.nextElementSibling;
-            existingWorkInfo.remove();
-            existingWorkInfo = nextElement;
-        }
-        commentsSectionTitle.insertAdjacentHTML('afterend', workInfoHtml);
+//modal login y registro
 
 
-        if (work.comments && work.comments.length > 0) {
-            work.comments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.classList.add('comment-item');
-                commentDiv.innerHTML = `
-                    <p class="mb-0">
-                        <span class="comment-author">${comment.author}</span>
-                        <span class="comment-date">${new Date(comment.date).toLocaleDateString()}</span>
-                    </p>
-                    <p class="comment-text">${comment.text}</p>
-                `;
-                commentsList.appendChild(commentDiv);
-            });
-        } else {
-            commentsList.innerHTML = `
-                <div class="no-comments-message">
-                    <i class="bi bi-chat-dots"></i>
-                    <p>Sé el primero en comentar esta obra.</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error("Error al cargar los comentarios de la obra:", error);
-        commentsList.innerHTML = `<div class="no-comments-message text-danger"><i class="bi bi-exclamation-triangle"></i><p>Error al cargar comentarios.</p></div>`;
-    }
-}
- */
+
+
+
+
 // Al abrir el modal del visor de álbumes
- albumViewerModal.addEventListener('show.bs.modal', event => {
+albumViewerModal.addEventListener('show.bs.modal', event => {
     const button = event.relatedTarget;
     const albumId = button.getAttribute('data-album-id');
 
@@ -106,7 +50,9 @@ const commentTextInput = document.getElementById('commentText');
         renderComments(currentWorkId);
     }
     commentTextInput.value = '';
-}); 
+});
+
+
 
 
 

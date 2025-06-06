@@ -12,10 +12,7 @@ const authController = {
         }
 
         console.log(`Erro getLoginPage(): ${req.query.error}`)
-        res.render('login', {
-            prefijo: prefijo,
-            title: "Iniciar secion"
-        });
+        return res.redirect('./#loginModal')
     },
 
     getRegisterPage: (req, res) => {
