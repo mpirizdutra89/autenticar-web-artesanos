@@ -1,4 +1,5 @@
 // controllers/authController.js
+const pool = require('../db');
 const bcrypt = require('bcrypt');
 const UserModel = require('../models/UserModel');       // Importa el nuevo Modelo de Usuario
 const CredentialModel = require('../models/CredentialModel'); // Importa el nuevo Modelo de Credenciales
@@ -29,49 +30,80 @@ const authController = {
     postRegister: async (req, res) => {
         const { nombre, apellido, email, password } = req.body;
 
-        if (!nombre || !apellido || !email || !password) {
-            return res.redirect('/register?error=Todos los campos son obligatorios.');
-        }
+        const respuesta = {
+            ok: false,
+            data: null,
+            error: null,
+            url: '',
+            msj: "No se pudo registrar."
+        };
+
+        let connection;
 
         try {
-            // 1. Verificar si el email ya existe en la tabla 'usuarios'
+
             const existingUser = await UserModel.findByEmail(email);
             if (existingUser) {
-                return res.redirect('/register?error=El correo electrónico ya está registrado.');
+                respuesta.msj = "El correo electrónico ya está registrado.";
+                return res.status(401).json(respuesta);
             }
 
-            // 2. Crear el nuevo usuario en la tabla 'usuarios'
-            const newUserId = await UserModel.create(email);
+            // Obtener una conexión del pool. Es crucial usar esta MISMA conexión para toda la transacción.
+            connection = await pool.getConnection();
+            // Iniciar la transacción.
+            await connection.beginTransaction();
+
+            // 2. Crear el nuevo usuario en la tabla 'usuarios' usando UserModel.create
+            // Ahora, pasamos la 'connection' específica a tu método UserModel.create.
+            const newUserId = await UserModel.create(email, connection);
             if (!newUserId) {
-                throw new Error('Error al crear el usuario principal.');
+                throw new Error('Error al obtener el ID del usuario principal.');
             }
 
             // 3. Hashear la contraseña
             const saltRounds = 10;
             const passwordHash = await bcrypt.hash(password, saltRounds);
 
-            // 4. Crear las credenciales en la tabla 'credenciales'
-            const credentialsCreated = await CredentialModel.create(newUserId, passwordHash);
+            // 4. Crear las credenciales en la tabla 'credenciales' usando CredentialModel.create
+            // También pasamos la 'connection' aquí.
+            const credentialsCreated = await CredentialModel.create(newUserId, passwordHash, connection);
             if (!credentialsCreated) {
-                // Si falla la creación de credenciales, puedes considerar deshacer la creación del usuario
-                // En un sistema real, esto se manejaría con transacciones.
                 throw new Error('Error al crear credenciales para el usuario.');
             }
 
-            // 5. Crear el perfil en la tabla 'perfiles'
-            const profileCreated = await ProfileModel.create(newUserId, nombre, apellido);
+            // 5. Crear el perfil en la tabla 'perfiles' usando ProfileModel.create
+            // Y aquí también pasamos la 'connection'.
+            const profileCreated = await ProfileModel.create(newUserId, nombre, apellido, connection);
             if (!profileCreated) {
-                // Similarmente, considerar deshacer si el perfil no se crea
                 throw new Error('Error al crear el perfil del usuario.');
             }
 
-            // Iniciar sesión automáticamente después del registro
+            // Si todas las operaciones de los modelos fueron exitosas, confirmamos la transacción.
+            await connection.commit();
+
+            // Si todo el registro fue exitoso, iniciar sesión automáticamente y redirigir
             req.session.user = { id: newUserId, email: email, nombre: nombre };
-            res.redirect('/dashboard');
+            respuesta.msj = `Se a registrado correctamente, ${req.session.user.email}`//podria decirle que verifique el correo electronico
+            respuesta.ok = true
+            res.status(200).json(respuesta);
 
         } catch (error) {
+            // Si ocurrió algún error, intentamos hacer rollback.
+            if (connection) {
+                await connection.rollback();
+                console.error('Transacción de registro revertida debido a un error.');
+            }
             console.error('Error al registrar usuario:', error);
-            res.redirect('/register?error=Error al registrar el usuario. Inténtalo de nuevo.');
+
+            respuesta.msj = "Error al registrar el usuario. Inténtalo de nuevo.";
+            respuesta.error = error.message;
+            res.status(500).json(respuesta);
+        } finally {
+            // Siempre liberar la conexión al pool.
+            if (connection) {
+                connection.release();
+                console.log('Conexión liberada al pool.');
+            }
         }
     },
 

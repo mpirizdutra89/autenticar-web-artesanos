@@ -105,12 +105,12 @@
                   | Por favor, introduce tu apellido.
               .mb-3
                 label.form-label(for="registerEmail") Email
-                input#registerEmail.form-control(type="email",name="email", placeholder="tu@ejemplo.com",required)
+                input#registerEmail.form-control(type="email",name="email", placeholder="tu@ejemplo.com", autocomplete="off",required)
                 .invalid-feedback
                   | Por favor, introduce un correo electrónico válido
               .mb-3
                 label.form-label(for="registerPassword") Contraseña
-                input#registerPassword.form-control(type="password",name="password", placeholder="Mínimo 8 caracteres",required)
+                input#registerPassword.form-control(type="password",name="password", placeholder="Mínimo 8 caracteres", autocomplete="off" ,required)
                 .invalid-feedback
                   | La contraseña debe tener al menos 6 caracteres.
               .mb-3
@@ -118,6 +118,8 @@
                 input#confirmPassword.form-control(type="password",name="confirmPassword", placeholder="Repite tu contraseña",required,autocomplete="off")
                 .invalid-feedback
                   | Las contraseñas no coinciden.
+              .mb-3 
+                #errorMessageDisplay
               button.btn.btn-custom-primary.w-100(type="submit") Crear Cuenta
           .modal-footer.justify-content-center
             p.mb-0 ¿Ya tienes cuenta? 

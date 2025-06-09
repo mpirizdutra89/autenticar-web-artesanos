@@ -1,11 +1,11 @@
 // models/ProfileModel.js
-const db = require('../db'); // Importa el pool de conexiones
+const pool = require('../db'); // Importa el pool de conexiones
 
 class ProfileModel {
     // Busca el perfil por ID de usuario
     static async findByUserId(userId) {
         try {
-            const [rows] = await db.execute(
+            const [rows] = await pool.execute(
                 'SELECT nombre, apellido, imagen_perfil_url, intereses, antecedentes, es_portafolio_publico FROM perfiles WHERE usuarios_id = ?',
                 [userId]
             );
@@ -17,13 +17,13 @@ class ProfileModel {
     }
 
     // Crea un nuevo perfil para un usuario
-    static async create(userId, nombre, apellido) {
+    static async create(userId, nombre, apellido, conn = pool) {
         try {
-            const [result] = await db.execute(
+            const [result] = await conn.execute(
                 'INSERT INTO perfiles (usuarios_id, nombre, apellido) VALUES (?, ?, ?)',
                 [userId, nombre, apellido]
             );
-            return result.affectedRows > 0;
+            return result.affectedRows > 0; // Retorna true si se insertó al menos una fila
         } catch (error) {
             console.error('Error al crear perfil:', error);
             throw error;
@@ -51,7 +51,7 @@ class ProfileModel {
         values.push(userId);
 
         try {
-            const [result] = await db.execute(query, values);
+            const [result] = await pool.execute(query, values);
             return result.affectedRows > 0;
         } catch (error) {
             console.error('Error al actualizar perfil:', error);

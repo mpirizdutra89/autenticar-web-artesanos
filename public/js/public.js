@@ -151,73 +151,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Opcional: Limpiar el formulario después del envío exitoso
             elements.loginForm.loginForm.reset();
-            elements.loginForm.loginForm.classList.remove('was-validated'); // Quitar los estilos de validación
+            elements.loginForm.classList.remove('was-validated'); // Quitar los estilos de validación
         }
 
         // --- Función para manejar el submit del formulario de Registro ---
-        function handleRegisterSubmit(event) {
-            event.preventDefault(); // Evitar el envío por defecto del formulario
-            event.stopPropagation(); // Detener la propagación del evento
-
-            // Limpiar estilos de validación anteriores si es necesario (opcional)
-            // registerForm.classList.remove('was-validated');
-
-            // Validar que las contraseñas coincidan antes de la validación de Bootstrap
+        async function handleRegisterSubmit(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            elements.errorMessageDisplay.style.display = 'none';
+            elements.errorMessageDisplay.textContent = '';
 
 
-            let passwordsMatch = true;
-            if (elements.passwordField.value !== elements.repeatPasswordField.value) {
-                elements.repeatPasswordField.setCustomValidity('Las contraseñas no coinciden.');
-                passwordsMatch = false;
-            } else {
-                elements.repeatPasswordField.setCustomValidity('');
+            const passwordsMatch = checkPasswordsMatch();
+            if (!passwordsMatch) {
+                console.log('Las contraseñas no coinciden. Envío del formulario bloqueado.');
+
+                return;
             }
 
             // Aplicar la validación de Bootstrap
-            if (!registerForm.checkValidity() || !passwordsMatch) {
-                // Si el formulario no es válido o las contraseñas no coinciden, agrega la clase
+            if (!elements.registerForm.checkValidity()) {
+                // Si el formulario no es válido, agrega la clase para mostrar los mensajes de feedback
                 elements.registerForm.classList.add('was-validated');
-                console.log('Formulario de Registro inválido.');
+                console.log('Formulario de registro inválido.');
                 return; // Detener la ejecución si hay errores de validación
             }
 
-            // Si el formulario es válido y las contraseñas coinciden, podemos acceder a los datos
-            /* const name = registerForm.elements.name.value;
-            const lastName = registerForm.elements.lastName.value;
-            const email = registerForm.elements.email.value;
-            const password = registerForm.elements.password.value; // Ya sabemos que coincide */
 
-            /*  console.log('Datos del Registro:', { name, lastName, email, password }); */
 
-            // Aquí es donde normalmente enviarías estos datos a tu backend
-            // Ejemplo de fetch (simulado):
-            // fetch('/api/register', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({ name, lastName, email, password })
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     if (data.success) {
-            //         alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
-            //         // Opcional: Redirigir al usuario al formulario de login
-            //         window.location.href = '#loginForm';
-            //     } else {
-            //         alert('Error al registrarse: ' + data.message);
-            //     }
-            // })
-            // .catch(error => {
-            //     console.error('Error en la solicitud de registro:', error);
-            //     alert('Ocurrió un error al intentar registrarte.');
-            // });
+            const formData = new FormData(event.target);
+            const datos = {};
+            formData.forEach((value, key) => {
+                datos[key] = value;
+            });
 
-            alert('Simulación de registro exitoso para: ' + email);
+            if (!VerificarCampos(datos)) {
+                elements.errorMessageDisplay.style.display = 'block';
+                elements.errorMessageDisplay.textContent = 'Todo los campos son obligatorios';
+                return;
+            }
+
+
+
+            try {
+                const response = await fetch('/usuario/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos),
+                    redirect: 'manual'
+                });
+
+                const responseData = await response.json();
+
+                if (responseData.ok === false) { // Si el JSON indica un fallo
+                    elements.errorMessageDisplay.textContent = responseData.msj || 'Error de registro.';
+                    elements.errorMessageDisplay.style.display = 'block';
+                } else {
+                    if (responseData.ok === true) {
+                        window.location.href = responseData.url; // Asume éxito y redirige
+                    } else {
+                        // Cualquier otro caso inesperado con JSON
+                        elements.errorMessageDisplay.textContent = responseData.msj || 'Ocurrió un error inesperado en el servidor.';
+                        elements.errorMessageDisplay.style.display = 'block';
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error de red al enviar el formulario:', error);
+                elements.errorMessageDisplay.textContent = 'No se pudo conectar con el servidor. Inténtalo de nuevo.';
+                elements.errorMessageDisplay.style.display = 'block';
+            }
+
+
             // Opcional: Limpiar el formulario después del envío exitoso
             elements.registerForm.reset();
             elements.registerForm.classList.remove('was-validated'); // Quitar los estilos de validación
         }
+
 
         // --- Asignar los event listeners a cada formulario ---
         if (elements.loginForm) {
@@ -227,24 +237,51 @@ document.addEventListener('DOMContentLoaded', function () {
         if (elements.registerForm) {
             elements.registerForm.addEventListener('submit', handleRegisterSubmit);
 
-
-
-            function checkPasswordsMatch() {
-                if (elements.repeatPasswordField.value !== elements.passwordField.value) {
-                    elements.repeatPasswordField.setCustomValidity('Las contraseñas no coinciden.');
-                } else {
-                    elements.repeatPasswordField.setCustomValidity('');
-                }
-                // Disparar la validación visual de Bootstrap para el campo
-                elements.repeatPasswordField.reportValidity();
-            }
-
-            elements.passwordField.addEventListener('input', checkPasswordsMatch);
-            elements.repeatPasswordField.addEventListener('input', checkPasswordsMatch);
         }
+
     }
 });
 
+
+
+
+function checkPasswordsMatch() {
+    // Solo si ambos campos existen, realizamos la validación
+    if (elements.repeatPasswordField && elements.passwordField) {
+        if (elements.repeatPasswordField.value !== elements.passwordField.value) {
+            // Las contraseñas NO coinciden
+
+            // Establece un mensaje de validación personalizado (para validación nativa de HTML5)
+            elements.repeatPasswordField.setCustomValidity('Las contraseñas no coinciden.');
+
+            // Agrega la clase 'is-invalid' para mostrar el feedback de Bootstrap
+            elements.repeatPasswordField.classList.add('is-invalid');
+            // Asegúrate de remover 'is-valid' si estaba presente
+            elements.repeatPasswordField.classList.remove('is-valid');
+
+            // reportValidity() ayuda a que el navegador muestre el feedback nativo,
+            // que a menudo se integra con Bootstrap.
+            elements.repeatPasswordField.reportValidity();
+            return false;
+        } else {
+            // Las contraseñas SÍ coinciden
+
+            // Borra el mensaje de validación personalizado
+            elements.repeatPasswordField.setCustomValidity('');
+
+            // Agrega la clase 'is-valid' para mostrar el feedback de Bootstrap (opcional, pero buena práctica)
+            elements.repeatPasswordField.classList.add('is-valid');
+            // Remueve la clase 'is-invalid' si estaba presente
+            elements.repeatPasswordField.classList.remove('is-invalid');
+
+            // No es estrictamente necesario llamar a reportValidity() aquí si ya son válidas,
+            // pero si usas el formulario para el submit, el navegador lo valida de todas formas.
+            return true;
+        }
+    }
+    // Si falta algún campo, asumimos que no coinciden para evitar el envío
+    return false;
+}
 
 /**
  * Verifica si todos los campos en un objeto de datos (obtenidos de FormData)

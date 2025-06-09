@@ -1,11 +1,11 @@
 // models/UserModel.js
-const db = require('../db'); // Importa el pool de conexiones
+const pool = require('../db'); // Importa el pool de conexiones
 
 class UserModel {
     // Busca un usuario por su ID
     static async findById(id) {
         try {
-            const [rows] = await db.execute('SELECT id, email, fecha_registro FROM usuarios WHERE id = ?', [id]);
+            const [rows] = await pool.execute('SELECT id, email, fecha_registro FROM usuarios WHERE id = ?', [id]);
             return rows[0];
         } catch (error) {
             console.error('Error al buscar usuario por ID:', error);
@@ -16,7 +16,7 @@ class UserModel {
     // Busca un usuario por su email
     static async findByEmail(email) {
         try {
-            const [rows] = await db.execute('SELECT id, email, fecha_registro FROM usuarios WHERE email = ?', [email]);
+            const [rows] = await pool.execute('SELECT id, email, fecha_registro FROM usuarios WHERE email = ?', [email]);
             return rows[0];
         } catch (error) {
             console.error('Error al buscar usuario por email:', error);
@@ -25,9 +25,10 @@ class UserModel {
     }
 
     // Crea un nuevo usuario en la tabla 'usuarios'
-    static async create(email) {
+    static async create(email, conn = pool) { // Por defecto usa el pool, si se pasa 'conn' usa esa conexión
         try {
-            const [result] = await db.execute(
+            // Usa la conexión proporcionada (o el pool por defecto)
+            const [result] = await conn.execute(
                 'INSERT INTO usuarios (email) VALUES (?)',
                 [email]
             );
@@ -37,7 +38,6 @@ class UserModel {
             throw error;
         }
     }
-
     // Puedes añadir más métodos para operaciones CRUD en la tabla 'usuarios' si los necesitas.
 }
 

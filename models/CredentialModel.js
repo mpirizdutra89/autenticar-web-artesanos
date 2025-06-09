@@ -1,5 +1,5 @@
 // models/CredentialModel.js
-const db = require('../db'); // Importa el pool de conexiones
+const pool = require('../db'); // Importa el pool de conexiones
 
 class CredentialModel {
     // Busca las credenciales por usuario_id
@@ -17,13 +17,13 @@ class CredentialModel {
     }
 
     // Crea nuevas credenciales para un usuario
-    static async create(usuarioId, passwordHash) {
+    static async create(userId, passwordHash, conn = pool) {
         try {
-            const [result] = await db.execute(
-                'INSERT INTO credenciales (usuario_id, password_hash, fecha_ultimo_cambio_password) VALUES (?, ?, NOW())',
-                [usuarioId, passwordHash]
+            const [result] = await conn.execute(
+                'INSERT INTO credenciales (usuario_id, password_hash) VALUES (?, ?)',
+                [userId, passwordHash]
             );
-            return result.affectedRows > 0;
+            return result.affectedRows > 0; // Retorna true si se insertó al menos una fila
         } catch (error) {
             console.error('Error al crear credenciales:', error);
             throw error;
@@ -33,7 +33,7 @@ class CredentialModel {
     // Actualiza el hash de la contraseña de un usuario
     static async updatePassword(usuarioId, newPasswordHash) {
         try {
-            const [result] = await db.execute(
+            const [result] = await pool.execute(
                 'UPDATE credenciales SET password_hash = ?, fecha_ultimo_cambio_password = NOW() WHERE usuario_id = ?',
                 [newPasswordHash, usuarioId]
             );
