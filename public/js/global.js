@@ -133,3 +133,43 @@ albumViewerModal.addEventListener('hidden.bs.modal', () => {
         document.exitFullscreen();
     }
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector("#countdownDisplay")) {
+        redirigirConConteo('/', 3);
+    }
+});
+/**
+* Redirige a una URL después de un conteo regresivo visible.
+*
+* @param {string} url - La URL a la que se redirigirá.
+* @param {number} segundos - El número de segundos para el conteo regresivo.
+* @param {string} [elementoId='countdownDisplay'] - El ID del elemento HTML donde se mostrará el conteo.
+*/
+function redirigirConConteo(url, segundos, elementoId = 'countdownDisplay') {
+    const display = document.getElementById(elementoId);
+    let tiempoRestante = segundos;
+
+    if (!display) {
+        console.error(`Error: Elemento con ID '${elementoId}' no encontrado. Redirigiendo directamente.`);
+        setTimeout(() => {
+            window.location.href = url;
+        }, segundos * 1000);
+        return;
+    }
+
+    // Muestra el conteo inicial
+    display.textContent = tiempoRestante;
+
+    const intervalo = setInterval(() => {
+        tiempoRestante--;
+        display.textContent = tiempoRestante;
+
+        if (tiempoRestante <= 0) {
+            clearInterval(intervalo);
+            window.location.href = url;
+        }
+    }, 1000);
+}
+

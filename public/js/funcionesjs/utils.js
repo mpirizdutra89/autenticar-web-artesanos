@@ -50,3 +50,46 @@ export function getTimeAgo(date) {
 export function origenLamadas(msj) {
     console.trace(`Origin de la llamada: ${msj}`);
 }
+
+
+/**
+ * Convierte un nombre de color común a la clase de texto de Bootstrap 5.
+ *
+ * @param {string} nombreColor - El nombre del color (ej. "rojo", "azul", "verde").
+ * @returns {string} La clase de Bootstrap 'text-*' correspondiente, o 'text-dark' si no se encuentra.
+ */
+export function obtenerClaseTextoBootstrap(nombreColor) {
+    // Convertimos el nombre del color a minúsculas para hacer la comparación insensible a mayúsculas/minúsculas
+    const colorNormalizado = nombreColor.toLowerCase();
+
+    switch (colorNormalizado) {
+        case 'rojo':
+            return 'text-danger';
+        case 'azul':
+            return 'text-primary'; // El azul primario de Bootstrap
+        case 'verde':
+            return 'text-success';
+        case 'amarillo':
+            return 'text-warning';
+        case 'cian':
+            return 'text-info'; // El cian de Bootstrap
+        case 'negro':
+            return 'text-dark';
+        case 'blanco':
+            return 'text-white'; // Para usar en fondos oscuros
+        case 'gris':
+            return 'text-secondary'; // El gris de Bootstrap
+
+        // Puedes añadir más casos según los colores que necesites mapear.
+
+        default:
+            // Si el color no coincide con ninguno de los casos, devolvemos un valor por defecto.
+            // 'text-dark' es una buena opción si quieres que siempre haya un color visible.
+            // O podrías devolver un string vacío '' si no quieres aplicar ninguna clase.
+            console.warn(`Color '${nombreNormalizado}' no reconocido. Devolviendo 'text-dark'.`);
+            return 'text-dark';
+    }
+}
+
+
+

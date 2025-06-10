@@ -5,7 +5,8 @@ class CredentialModel {
     // Busca las credenciales por usuario_id
     static async findByUserId(userId) {
         try {
-            const [rows] = await db.execute(
+            console.log(userId)
+            const [rows] = await pool.execute(
                 'SELECT usuario_id, password_hash FROM credenciales WHERE usuario_id = ?',
                 [userId]
             );

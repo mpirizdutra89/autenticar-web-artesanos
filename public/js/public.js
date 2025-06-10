@@ -48,7 +48,7 @@
     });
 });
  */
-import { getElement } from './funcionesjs/utils.js';
+import { getElement, obtenerClaseTextoBootstrap } from './funcionesjs/utils.js';
 const elements = {};
 
 function cacheDOMElements() {
@@ -111,14 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-            /* if (VerificarCampos(datos)) {
-                elements.errorMessageDisplay.textContent = 'Todo los campos son obligatorios';
-                elements.errorMessageDisplay.style.display = 'block';
-                return;
-            } */
-
-
             try {
                 const response = await fetch('/usuario/login', {
                     method: 'POST',
@@ -138,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         // Cualquier otro caso inesperado con JSON
                         elements.errorMessageDisplay.textContent = responseData.msj || 'Ocurrió un error inesperado en el servidor1.';
+
                         elements.errorMessageDisplay.style.display = 'block';
                     }
                 }
@@ -147,7 +140,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 elements.errorMessageDisplay.textContent = 'No se pudo conectar con el servidor. Inténtalo de nuevo.';
                 elements.errorMessageDisplay.style.display = 'block';
             }
-
+            elements.errorMessageDisplay.classList.remove('text-warning');
+            const classText = obtenerClaseTextoBootstrap('rojo')
+            elements.errorMessageDisplay.classList.add(classText);
 
             // Opcional: Limpiar el formulario después del envío exitoso
             elements.loginForm.loginForm.reset();
@@ -338,9 +333,11 @@ function VerificarCampos(data) {
 const abrirLogin = () => {
     // Estas comprobaciones iniciales están bien, pero asegúrate de que 'elements'
     // esté definido y contenga 'loginForm' y 'registerModal' si los usas.
+
     if (!elements.loginForm && !elements.registerModal) {
         return;
     }
+
 
     if (window.location.hash) {
         const hash = window.location.hash; // Obtiene algo como '#loginmodal?msj=algo'
@@ -371,6 +368,7 @@ const abrirLogin = () => {
             //console.log('Mensaje extraído:', mensaje); // Para depuración
         }
 
+
         // 3. Usar el modalId (que ahora es 'loginmodal' sin el query)
         const targetModal = document.getElementById(modalId); // Usamos getElementById ya que `modalId` es un ID
 
@@ -391,8 +389,14 @@ const abrirLogin = () => {
                         modalBody.appendChild(messageElement);
                     }
                     messageElement.textContent = `Mensaje: ${mensaje}`;
+                    messageElement.classList.remove('text-warning');
+                    const classText = obtenerClaseTextoBootstrap('verde')
+
+                    messageElement.classList.add(classText);
+                    messageElement.style.display = 'block'
                 }
             }
         }
     }
 };
+

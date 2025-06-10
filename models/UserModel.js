@@ -46,10 +46,10 @@ class UserModel {
      * @param {object} [conn=pool] - La conexión de la base de datos (opcional, para transacciones).
      * @returns {boolean} True si se actualizó correctamente.
      */
-    static async saveVerificationToken(userId, token, expiresAt, conn = pool) {
+    static async saveVerificationToken(userId, token, expiresAt) {
         try {
-            const [result] = await conn.execute(
-                'UPDATE usuarios SET email_verification_token = ?, email_verification_expires_at = ?, is_email_verified = 0 WHERE id = ?',
+            const [result] = await pool.execute(
+                'UPDATE usuarios SET email_verification_token = ?, email_verification_expires_at = ?, is_email_verified = 0 WHERE is_email_verified = 0 and id = ?',
                 [token, expiresAt, userId]
             );
             return result.affectedRows > 0;
@@ -66,7 +66,7 @@ class UserModel {
      */
     static async findByVerificationToken(token) {
         try {
-            const [rows] = await pool.execute('SELECT id, email, is_email_verified, email_verification_expires_at FROM usuarios WHERE email_verification_token = ?', [token]);
+            const [rows] = await pool.execute('SELECT id, email, is_email_verified, email_verification_expires_at FROM usuarios WHERE is_email_verified = 0 and email_verification_token = ?', [token]);
             return rows.length > 0 ? rows[0] : null;
         } catch (error) {
             console.error('Error al buscar usuario por token de verificación:', error);
@@ -83,7 +83,7 @@ class UserModel {
     static async markEmailAsVerified(userId, conn = pool) {
         try {
             const [result] = await conn.execute(
-                'UPDATE usuarios SET is_email_verified = 1, email_verification_token = NULL, email_verification_expires_at = NULL WHERE id = ?',
+                'UPDATE usuarios SET is_email_verified = 1, email_verification_token = NULL, email_verification_expires_at = NULL, fecha_registro=NOW() WHERE id = ?',
                 [userId]
             );
             return result.affectedRows > 0;

@@ -1,0 +1,27 @@
+extends layout_publico
+block content
+    .container.py-5(style="max-width: 50rem; text-align: center;")
+  
+        .card.shadow-lg.border-0.rounded-4
+            .card-body.p-4
+                if user
+                    if user.verified == 0
+                    
+                        h2.card-title.fw-bold.fs-3.mb-4.text-center.text-primary Verificación de la Cuenta
+
+                        if !ok 
+                    
+                            p.card-text.mb-3.text-muted.text-left #{msj}
+                            a.btn.btn-outline-primary.btn-lg(href="/usuario/crear-verificacion") Renviar la verificacion
+                        
+                        else 
+
+                            h2.card-title.fw-bold.fs-3.mb-3.text-center.text-success ¡Cuenta Verificada!
+                            p.card-text.mb-4.text-muted Tu cuenta ya está activa.
+                            a.btn.btn-outline-primary.btn-lg(href="/dashboard") Volver al Dashboard
+                        
+
+                    else 
+                        // Si el usuario ya está verificado
+                        h2.card-title.fw-bold.fs-3.mb-3.text-center.text-success #{msj}
+                        a.btn.btn-outline-primary.btn-lg(href="/dashboard") Volver al Dashboard

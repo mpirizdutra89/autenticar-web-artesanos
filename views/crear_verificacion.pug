@@ -1,0 +1,32 @@
+extends layout_publico
+block content
+    .container.py-5(style="max-width: 50rem; text-align: center;")
+  
+        .card.shadow-lg.border-0.rounded-4
+            .card-body.p-4
+                if user
+                    if user.verified == 0
+                    
+                        h2.card-title.fw-bold.fs-3.mb-4.text-center.text-primary Verificación de la Cuenta
+
+                        if msj 
+                    
+                            p.card-text.mb-3.text-muted.text-left #{msj}
+                        else 
+                            p.card-text.mb-4.text-secondary Parece que tu cuenta no está verificada. Por favor, revisa tu bandeja de entrada o solicita un reenvío.
+                            
+                        
+                        
+                        form#RenviarEmail.needs-validation.text-left(action='/usuario/crear-verificacion' method='GET' novalidate)
+                                .mb-3
+                                    label.form-label(for="registerEmail") Email
+                                    input#registerEmail.form-control.form-control-lg(type="email", name="email", placeholder="tu@dominio.com", autocomplete="off", required)
+                                    .invalid-feedback Por favor, introduce un correo electrónico válido.
+                                .mb-3
+                                    button.btn.btn-primary.btn-lg.w-100(type="submit") Reenviar Email
+                    
+
+                    else 
+                        // Si el usuario ya está verificado
+                        h2.card-title.fw-bold.fs-3.mb-3.text-center.text-success ¡Cuenta Verificada!
+                        a.btn.btn-outline-primary.btn-lg(href="/dashboard") Volver al Dashboard
