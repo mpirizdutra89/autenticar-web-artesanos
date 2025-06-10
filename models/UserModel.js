@@ -16,7 +16,7 @@ class UserModel {
     // Busca un usuario por su email
     static async findByEmail(email) {
         try {
-            const [rows] = await pool.execute('SELECT id, email, fecha_registro FROM usuarios WHERE email = ?', [email]);
+            const [rows] = await pool.execute('SELECT id, email, is_email_verified as verified ,fecha_registro FROM usuarios WHERE email = ?', [email]);
             return rows[0];
         } catch (error) {
             console.error('Error al buscar usuario por email:', error);
@@ -38,7 +38,60 @@ class UserModel {
             throw error;
         }
     }
-    // Puedes añadir más métodos para operaciones CRUD en la tabla 'usuarios' si los necesitas.
+
+    /* Guarda el token de verificación de email y su fecha de expiración para un usuario.
+     * @param {number} userId - El ID del usuario.
+     * @param {string} token - El token de verificación.
+     * @param {Date} expiresAt - La fecha y hora de expiración del token.
+     * @param {object} [conn=pool] - La conexión de la base de datos (opcional, para transacciones).
+     * @returns {boolean} True si se actualizó correctamente.
+     */
+    static async saveVerificationToken(userId, token, expiresAt, conn = pool) {
+        try {
+            const [result] = await conn.execute(
+                'UPDATE usuarios SET email_verification_token = ?, email_verification_expires_at = ?, is_email_verified = 0 WHERE id = ?',
+                [token, expiresAt, userId]
+            );
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error('Error al guardar token de verificación:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Busca un usuario por su token de verificación.
+     * @param {string} token - El token de verificación.
+     * @returns {object|null} El objeto de usuario o null si no se encuentra.
+     */
+    static async findByVerificationToken(token) {
+        try {
+            const [rows] = await pool.execute('SELECT id, email, is_email_verified, email_verification_expires_at FROM usuarios WHERE email_verification_token = ?', [token]);
+            return rows.length > 0 ? rows[0] : null;
+        } catch (error) {
+            console.error('Error al buscar usuario por token de verificación:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Marca el email de un usuario como verificado y limpia los campos del token.
+     * @param {number} userId - El ID del usuario.
+     * @param {object} [conn=pool] - La conexión de la base de datos (opcional, para transacciones).
+     * @returns {boolean} True si se actualizó correctamente.
+     */
+    static async markEmailAsVerified(userId, conn = pool) {
+        try {
+            const [result] = await conn.execute(
+                'UPDATE usuarios SET is_email_verified = 1, email_verification_token = NULL, email_verification_expires_at = NULL WHERE id = ?',
+                [userId]
+            );
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error('Error al marcar email como verificado:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = UserModel;

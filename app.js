@@ -21,7 +21,8 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const { isAuthenticated, loadUserIntoView } = require('./middleware/authMiddleware');
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003
+const HOST = process.env.HOST ? process.env.HOST : "localhost"
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
@@ -158,9 +159,9 @@ app.set('views', path.join(__dirname, 'views'));
     app.set('socketio', io); // Almacenar la instancia de Socket.IO en el objeto 'app'
 
     // --- Inicio del Servidor HTTP con Socket.IO ---
-    server.listen(port, () => { // Cambia app.listen por server.listen
-        console.log(`🚀 Servidor escuchando en http://localhost:${port}`);
-        console.log('🔗 Visita http://localhost:3000/usuario en tu navegador para iniciar la aplicación.');
-        console.log('📝 Primero, regístrate en http://localhost:3000/usuario/register');
+    server.listen(PORT, HOST, () => { // Cambia app.listen por server.listen
+        console.log(`🚀 Servidor escuchando en http://${HOST}:${PORT}`);
+        console.log(`🔗 Visita http://${HOST}:${PORT}/usuario en tu navegador para iniciar la aplicación.`);
+        console.log(`📝 Primero, regístrate en http://http://${HOST}:${PORT}/usuario/register`);
     });
 })(); // -> La función se ejecuta automáticamente

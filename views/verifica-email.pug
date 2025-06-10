@@ -1,0 +1,9 @@
+extends layout_publico
+block content
+
+     .container-fluid.bg-light
+            .row
+                  .col-md-3.mx-auto.text-center.py-5
+                    if msj
+                      p.lead #{msj}
+                      a(href="/").btn.btn-secondary Volver al inicio

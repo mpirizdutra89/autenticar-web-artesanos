@@ -4,7 +4,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "mail":"nodemon config/testEnvio.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,8 +21,10 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "mysql2": "^3.14.1",
+    "nodemailer": "^7.0.3",
     "pug": "^3.0.3",
     "redis": "^5.1.0",
     "sequelize": "^6.37.7",

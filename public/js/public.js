@@ -321,7 +321,7 @@ function VerificarCampos(data) {
     return true;
 }
 
-const abrirLogin = () => {
+/* const abrirLogin = () => {
     if (!elements.loginForm && !elements.registerModal) {
         return;
     }
@@ -334,4 +334,65 @@ const abrirLogin = () => {
             myModal.show();
         }
     }
-}
+} */
+const abrirLogin = () => {
+    // Estas comprobaciones iniciales están bien, pero asegúrate de que 'elements'
+    // esté definido y contenga 'loginForm' y 'registerModal' si los usas.
+    if (!elements.loginForm && !elements.registerModal) {
+        return;
+    }
+
+    if (window.location.hash) {
+        const hash = window.location.hash; // Obtiene algo como '#loginmodal?msj=algo'
+
+        // 1. Separar el hash principal del query string dentro del hash
+        // Primero, removemos el '#' inicial
+        const hashContent = hash.substring(1); // 'loginmodal?msj=algo'
+
+        let modalId = '';
+        let queryStringInHash = '';
+
+        const questionMarkIndex = hashContent.indexOf('?');
+
+        if (questionMarkIndex !== -1) {
+            // Hay un query string dentro del hash
+            modalId = hashContent.substring(0, questionMarkIndex); // 'loginmodal'
+            queryStringInHash = hashContent.substring(questionMarkIndex + 1); // 'msj=algo'
+        } else {
+            // No hay query string, solo es el ID del modal
+            modalId = hashContent; // 'loginmodal'
+        }
+
+        // 2. Obtener el parámetro 'msj' del queryStringInHash
+        let mensaje = null;
+        if (queryStringInHash) {
+            const params = new URLSearchParams(queryStringInHash);
+            mensaje = params.get('msj'); // 'algo'
+            //console.log('Mensaje extraído:', mensaje); // Para depuración
+        }
+
+        // 3. Usar el modalId (que ahora es 'loginmodal' sin el query)
+        const targetModal = document.getElementById(modalId); // Usamos getElementById ya que `modalId` es un ID
+
+        if (targetModal) {
+            const myModal = new bootstrap.Modal(targetModal);
+            myModal.show();
+
+            // Aquí puedes usar el 'mensaje' si es necesario, por ejemplo, para mostrarlo en el modal
+            if (mensaje) {
+                // Ejemplo: Asumiendo que tu modal tiene un elemento con la clase 'modal-body' o un ID específico para el mensaje
+                const modalBody = targetModal.querySelector('.modal-footer'); // O el elemento que quieras
+                if (modalBody) {
+                    // Puedes crear un nuevo elemento o simplemente actualizar el texto de uno existente
+                    let messageElement = modalBody.querySelector('#errorMessage');
+                    if (!messageElement) {
+                        messageElement = document.createElement('p');
+                        messageElement.id = 'modalMessage';
+                        modalBody.appendChild(messageElement);
+                    }
+                    messageElement.textContent = `Mensaje: ${mensaje}`;
+                }
+            }
+        }
+    }
+};

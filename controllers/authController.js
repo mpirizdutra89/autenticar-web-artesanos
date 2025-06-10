@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt');
 const UserModel = require('../models/UserModel');       // Importa el nuevo Modelo de Usuario
 const CredentialModel = require('../models/CredentialModel'); // Importa el nuevo Modelo de Credenciales
 const ProfileModel = require('../models/ProfileModel');     // Importa el nuevo Modelo de Perfil
+const jwt = require('jsonwebtoken');
+const { sendVerificationEmail } = require('../services/emailService'); // Ajusta la ruta si es necesario
+const config = require('../config/config');
 //NOTAAA:
 const prefijo = "/usuario/" //aca la barra al principio hace la diferencha para desde el action del formulario no duplicar la ruta,
 const authController = {
@@ -39,7 +42,7 @@ const authController = {
         };
 
         let connection;
-
+        console.log(config)
         try {
 
             const existingUser = await UserModel.findByEmail(email);
@@ -57,7 +60,10 @@ const authController = {
             // Ahora, pasamos la 'connection' específica a tu método UserModel.create.
             const newUserId = await UserModel.create(email, connection);
             if (!newUserId) {
-                throw new Error('Error al obtener el ID del usuario principal.');
+                //throw new Error('Error al obtener el ID del usuario principal.');
+                console.log('Error al obtener el ID del usuario principal.')
+
+                return res.status(401).json(respuesta);
             }
 
             // 3. Hashear la contraseña
@@ -68,22 +74,59 @@ const authController = {
             // También pasamos la 'connection' aquí.
             const credentialsCreated = await CredentialModel.create(newUserId, passwordHash, connection);
             if (!credentialsCreated) {
-                throw new Error('Error al crear credenciales para el usuario.');
+                // throw new Error('Error al crear credenciales para el usuario.');
+                console.log('Error al crear credenciales para el usuario.')
+                return res.status(401).json(respuesta);
             }
 
             // 5. Crear el perfil en la tabla 'perfiles' usando ProfileModel.create
             // Y aquí también pasamos la 'connection'.
             const profileCreated = await ProfileModel.create(newUserId, nombre, apellido, connection);
             if (!profileCreated) {
-                throw new Error('Error al crear el perfil del usuario.');
+
+                console.log('Error al crear el perfil del usuario.')
+                return res.status(401).json(respuesta);
             }
+
+
+            // --- confirmación de email ---
+            // Generar un JWT para la verificación de email
+            const verificationToken = jwt.sign(
+                { userId: newUserId, email: email },
+                config.jwtSecret,
+                { expiresIn: '1h' } // El token expira en 1 hora
+            );
+
+            // Calcular la fecha de expiración para guardar en la BD
+            const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora en milisegundos
+
+            // Guardar el token de verificación en la base de datos
+            const tokenSaved = await UserModel.saveVerificationToken(newUserId, verificationToken, expiresAt, connection);
+            if (!tokenSaved) {
+                //throw new Error('Error al guardar el token de verificación.');
+                console.log('Error al guardar el token de verificación.')
+                return res.status(401).json(respuesta);
+            }
+
+            // Construir el enlace de verificación
+            const verificationLink = `${config.appBaseUrl}/usuario/verify-email?token=${verificationToken}`;
+
+            // Enviar el correo de verificación
+            const emailSent = await sendVerificationEmail(email, verificationLink);
+            if (!emailSent) {
+
+                console.log('No se pudo enviar el correo de verificación. El usuario podrá intentarlo más tarde.');
+                //throw new Error('Error al enviar el correo de verificación.');// si comento el usuario se creao con todo lo que se hizo pero no se verifica  el usuario
+                return res.status(401).json(respuesta);
+            }
+            // ---------------------------------------------------
 
             // Si todas las operaciones de los modelos fueron exitosas, confirmamos la transacción.
             await connection.commit();
 
             // Si todo el registro fue exitoso, iniciar sesión automáticamente y redirigir
-            req.session.user = { id: newUserId, email: email, nombre: nombre };
-            respuesta.msj = `Se a registrado correctamente, ${req.session.user.email}`//podria decirle que verifique el correo electronico
+            // req.session.user = { id: newUserId, email: email, nombre: nombre };
+            respuesta.msj = `¡Registro exitoso! Por favor, revisa tu correo electrónico ${email}, para verificar tu cuenta. `//podria decirle que verifique el correo electronico
             respuesta.ok = true
             res.status(200).json(respuesta);
 
@@ -153,7 +196,9 @@ const authController = {
                     };
                     respuesta.msj = `Sesion exitosa, bienvenido ${req.session.user.email}`
                     respuesta.ok = true
-                    respuesta.url = '/dashboard'
+                    respuesta.url = '/dashboard' // aca si no esta verificado , redireccionar a una view para la verificaion
+                    //la verificacion deve estar como algo aparte en esa vista, cosa de que el usuario se pueda volver a verificar
+                    //sin tener que  registrase
                     res.status(200).json(respuesta);
                     //res.redirect('/dashboard'); // Redirige al dashboard
                 } else {
@@ -182,8 +227,91 @@ const authController = {
             }
             res.redirect('/');
         });
+    },
+    verifyEmail: async (req, res) => {
+        const { token } = req.query; // Obtener el token de los parámetros de la URL
+        console.log(token)
+        const respuesta = {
+            ok: false,
+            data: null,
+            error: null,
+            url: '',
+            msj: "No se pudo verificar."
+        }
+        let msj = ""
+
+        if (!token) {
+            //return res.status(400).send('Token de verificación no proporcionado.');
+            //respuesta.msj="Token de verificación no proporcionado."
+            // res.status(400).json(respuesta);
+            msj = "Token de verificación no proporcionado."
+            render2(res, msj)
+        }
+
+        try {
+            // 1. Verificar la firma y expiración del token JWT
+            let decodedToken;
+
+            try {
+                decodedToken = jwt.verify(token, config.jwtSecret);
+            } catch (jwtError) {
+                msj = 'Token de verificación inválido o corrupto.'
+                if (jwtError.name === 'TokenExpiredError') {
+                    msj = 'El enlace de verificación ha expirado. Por favor, solicita uno nuevo.'
+                }
+
+                render2(res, msj)
+            }
+
+            // 2. Buscar al usuario por el token en la base de datos
+            const user = await UserModel.findByVerificationToken(token);
+
+            if (!user) {
+                console.log(user)
+                msj = 'Usuario no encontrado o token no válido en la base de datos.'
+                render2(res, msj)
+            }
+
+            // 3. Verificar si el email ya está verificado
+            if (user.is_email_verified) {
+                mjs = 'Tu correo electrónico ya ha sido verificado. ¡Gracias!'
+                render2(res, msj)
+            }
+
+            // 4. Verificar la expiración del token en la base de datos (doble chequeo por seguridad)
+            // Aunque JWT ya verifica la expiración, es bueno tener un chequeo en la BD si el token no se borró.
+            if (user.email_verification_expires_at && new Date() > user.email_verification_expires_at) {
+                msj = 'El enlace de verificación ha expirado. Por favor, solicita uno nuevo.'
+                render2(res, msj)
+            }
+
+            // 5. Marcar el email como verificado en la base de datos
+            const emailVerified = await UserModel.markEmailAsVerified(user.id);
+
+            if (emailVerified) {
+                // Opcional: Iniciar sesión al usuario automáticamente después de la verificación
+                // req.session.user = { id: user.id, email: user.email };
+                return res.redirect('./#loginModal?msj=El email fue verificado con exito, ya puede iniciar secion'); // redirige para iniciar secion
+            } else {
+                msj = 'No se pudo verificar el correo electrónico. Inténtalo de nuevo.'
+                render2(res, msj)
+            }
+
+        } catch (error) {
+            console.error('Error en la verificación de email:', error);
+            /* return res.status(500).send(''); */
+            msj = 'Ocurrió un error interno al verificar el correo electrónico.'
+            render2(res, msj)
+        }
     }
 };
+
+const render2 = (res, vista = 'verifica-email', msj, title = 'Verificacion email') => {
+    res.render(vista, {
+        msj: msj,
+        title: title
+    });
+}
 
 module.exports = authController;
 

@@ -16,7 +16,7 @@ router.post('/login', loginValidationRules(), validate, authController.postLogin
 router.post('/logout', authController.postLogout);
 
 router.get('/register', authController.getRegisterPage);
-
+router.get('/verify-email', authController.verifyEmail);
 router.get('/', authController.getLoginPage);
 
 module.exports = router;
