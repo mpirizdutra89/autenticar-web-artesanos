@@ -17,8 +17,12 @@ const inicioRoutes = require('./routes/inicio');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
-// Importa el middleware de autenticación
+const panelNotificacionesRoutes = require('./routes/panelNotificacion');
+
+// Importa el middleware de autenticación notificacion
 const { isAuthenticated, loadUserIntoView } = require('./middleware/authMiddleware');
+const loadNotificationsMiddleware = require('./middleware/notificationMiddleware'); // Importa tu nuevo middleware
+
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003
@@ -82,11 +86,15 @@ app.set('views', path.join(__dirname, 'views'));
     // APLICA EL MIDDLEWARE loadUserIntoView GLOBALMENTE
     // Esto hace que `res.locals.user` esté disponible en todas las vistas.
     app.use(loadUserIntoView);
+    // Aplica el Middleware de Notificaciones
+    // Esto hará que 'res.locals.notificaciones' esté disponible en cada solicitud
+    app.use(loadNotificationsMiddleware);
+
 
     app.use('/usuario', authRoutes);// Rutas de autenticación (login, logout, register)
     // Rutas del dashboard (protegidas por el middleware isAuthenticated)
     app.use('/dashboard', isAuthenticated, dashboardRoutes);
-
+    app.use('/panel-notificacion', isAuthenticated, panelNotificacionesRoutes)
     app.use('/', inicioRoutes);
 
     // Este middleware debe ir DESPUÉS de TODAS tus rutas definidas

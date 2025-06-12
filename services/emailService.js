@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 const sendVerificationEmail = async (userEmail, verificationLink) => {
     try {
         await transporter.sendMail({
-            from: `"Tu Aplicación" <${config.email.auth.user}>`, // Remitente
+            from: `"Artesanos.mpd" <${config.email.auth.user}>`, // Remitente
             to: userEmail, // Lista de destinatarios
             subject: "Confirma tu Correo Electrónico", // Asunto
             html: `
@@ -29,7 +29,7 @@ const sendVerificationEmail = async (userEmail, verificationLink) => {
                 <p>Este enlace expirará en 1 hora.</p>
                 <p>Si no te registraste en nuestra aplicación, por favor ignora este correo.</p>
                 <p>Saludos,</p>
-                <p>El equipo de tu aplicación</p>
+                
             `, // Contenido HTML del correo
         });
         console.log(`Correo de verificación enviado a ${userEmail}`);

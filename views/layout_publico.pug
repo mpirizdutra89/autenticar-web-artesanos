@@ -7,7 +7,8 @@ html(lang="es")
       title #{title}
     else 
       title Artesanos
-    link(rel="shortcut icon", href="img/icon/favicon.png", type="image/x-icon")
+    
+    link(rel="shortcut icon", href="/img/icon/favicon.png", type="image/x-icon")
     link(href="/bootstrap/css/bootstrap.min.css", rel="stylesheet")
     link(rel="stylesheet", href="/bootstrap-icons/bootstrap-icons.min.css")
     link(rel="stylesheet", href="/css/style.css") 
@@ -27,41 +28,18 @@ html(lang="es")
                 i.bi.bi-search
           .d-flex.align-items-center#Notificacion-perfil-usuario
             if user
-                .dropdown.me-3
-                  a.nav-link.position-relative(href="#", id="notificationsDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
-                    i.bi.bi-bell-fill.h4
-                    span.badge.bg-danger.rounded-pill.position-absolute.notification-badge#nrNotificacion 3
-                  ul.dropdown-menu.dropdown-menu-end.notifications-dropdown-menu(aria-labelledby="notificationsDropdown")
-                    h6.dropdown-header Notificaciones
-                    li
-                      hr.dropdown-divider
+                if !panel_notificacion
                   
-                    li
-                      a.dropdown-item.d-flex.align-items-center.notifications-dropdown-item(href="#")
-                        i.bi.bi-person-plus-fill.text-primary.notification-icon
-                        .notification-info.flex-grow-1
-                          p.mb-1
-                            strong SofiaM
-                            |  te ha enviado una solicitud de amistad.
-                          .d-flex.justify-content-end.mt-2
-                            button.btn.btn-sm.btn-success.me-2 Aceptar
-                            button.btn.btn-sm.btn-danger Rechazar
-                    
-                    li
-                      a.dropdown-item.d-flex.align-items-center.notifications-dropdown-item(href="#")
-                        i.bi.bi-chat-text-fill.text-info.notification-icon
-                        .notification-info.flex-grow-1 
-                          p.mb-1
-                            strong RicardoV
-                            |  comentó en tu obra "El Silencio Urbano".
-                          small.text-muted "Me encanta cómo capturas la soledad..."
-                          .text-end.mt-1
-                          
-                            span.text-warning.cursor-pointer(onclick="window.location.href='#';")
-                    li
-                      hr.dropdown-divider
-                    li
-                      a.dropdown-item.text-center.text-warning(href="#") Ver todas las notificaciones
+                      .dropdown.me-3
+                        a.nav-link.position-relative(href="#", id="notificationsDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
+                          i.bi.bi-bell-fill.h4
+                          span.badge.bg-danger.rounded-pill.position-absolute.notification-badge#notification-count 
+                        ul#notification-list-container.dropdown-menu.dropdown-menu-end.notifications-dropdown-menu(aria-labelledby="notificationsDropdown")
+                            h6.dropdown-header Notificaciones
+                            li
+                              hr.dropdown-divider
+                            div#no-notifications(style="display: none; padding: 10px; text-align: center; color: #6c757d;") No hay notificaciones.
+                            div#listaNotificaciones
 
                 // Menú desplegable del perfil de usuario
                 .dropdown
@@ -93,9 +71,28 @@ html(lang="es")
     if user
       include ./partials/profile_offcanvas.pug
       include ./partials/settings_offcanvas.pug    
-    script(src="/bootstrap/js/bootstrap.bundle.min.js")   
-    script(src="/js/global.js")
+    
+      // Tu contenido HTML, navegación, etc.
 
-   
+    // Scripts al final del body para un mejor rendimiento de carga
+
+    // LIBRARIES JAVASCRIPT REQUERIDAS PRIMERO
+    script(src="/bootstrap/js/bootstrap.bundle.min.js") // 1. Bootstrap JS (para componentes)
+    script(src='/socket.io/socket.io.js')               // 2. Socket.IO Client JS (para 'io()' global)
+
+    // INYECCIÓN DE DATOS DINÁMICOS AL CLIENTE
+    // Esto se ejecuta ANTES de cualquier script externo que dependa de 'notificaciones'
+    script.
+      window.initialNotificationsData = !{JSON.stringify(notificaciones || [])};
+
+    // TUS SCRIPTS PERSONALIZADOS (que dependen de las librerías anteriores y de initialNotificationsData)
+    // Usamos 'block append scripts' para que las vistas que extienden este layout puedan añadir sus propios scripts AQUÍ.
+    // Esto asegura que 'notificaciones.js' se cargue antes que cualquier script específico de una vista.
+    script(src='/js/notificaciones.js' type="module") // Tu script de notificaciones
+    script(src="/js/global.js")         // Tu script global
+
+    // Este 'block scripts' se puede usar en tus vistas que extienden el layout
+    // para añadir scripts específicos de esa vista, y se cargarán DESPUÉS
+    // de notificaciones.js y global.js.
     block scripts
 

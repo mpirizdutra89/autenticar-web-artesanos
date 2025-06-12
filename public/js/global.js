@@ -11,7 +11,7 @@ const currentWorkCommentsTitle = document.getElementById('currentWorkCommentsTit
 const addCommentForm = document.getElementById('addCommentForm');
 const commentTextInput = document.getElementById('commentText');
 
-//modal login y registro
+
 
 
 

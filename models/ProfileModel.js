@@ -6,7 +6,7 @@ class ProfileModel {
     static async findByUserId(userId) {
         try {
             const [rows] = await pool.execute(
-                'SELECT nombre, apellido, imagen_perfil_url, intereses, antecedentes, es_portafolio_publico FROM perfiles WHERE usuarios_id = ?',
+                'SELECT nombre, apellido, imagen_perfil_url, intereses, antecedentes, es_portafolio_publico FROM perfiles WHERE usuario_id = ?',
                 [userId]
             );
             return rows[0];
@@ -20,7 +20,7 @@ class ProfileModel {
     static async create(userId, nombre, apellido, conn = pool) {
         try {
             const [result] = await conn.execute(
-                'INSERT INTO perfiles (usuarios_id, nombre, apellido) VALUES (?, ?, ?)',
+                'INSERT INTO perfiles (usuario_id, nombre, apellido) VALUES (?, ?, ?)',
                 [userId, nombre, apellido]
             );
             return result.affectedRows > 0; // Retorna true si se insertó al menos una fila
@@ -47,7 +47,7 @@ class ProfileModel {
             return false; // No hay nada que actualizar
         }
 
-        const query = `UPDATE perfiles SET ${fields.join(', ')} WHERE usuarios_id = ?`;
+        const query = `UPDATE perfiles SET ${fields.join(', ')} WHERE usuario_id = ?`;
         values.push(userId);
 
         try {

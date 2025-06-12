@@ -1,0 +1,168 @@
+extends layout_publico
+block content
+    style.
+            .panel-container {
+                background-color: #ffffff;
+                border-radius: 1rem; /* Bordes más redondeados para el contenedor principal */
+                box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08); /* Sombra más pronunciada */
+                padding: 2.5rem;
+            }
+            .notification-list-item {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 0.75rem;
+                padding: 1rem 1.25rem;
+                border-radius: 0.75rem;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: 1px solid rgba(0, 0, 0, 0.05); /* Borde sutil */
+            }
+            .notification-list-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+            }
+            
+            /* Notificaciones No Leídas */
+            .notification-list-item.unread {
+                background-color: #e6f7ff !important; /* Azul claro */
+                border-left: 6px solid #1890ff; /* Borde izquierdo azul fuerte */
+            }
+            .notification-list-item.unread .notification-icon {
+                color: #1890ff;
+            }
+            .notification-list-item.unread .notification-message {
+                font-weight: 500; /* Texto más prominente */
+                color: #333;
+            }
+            
+            /* Notificaciones Leídas */
+            .notification-list-item.read {
+                background-color: #f5f5f5 !important; /* Gris claro */
+                color: #7f8c8d;
+                border-left: 6px solid #dcdcdc; /* Borde izquierdo gris */
+            }
+            .notification-list-item.read .notification-icon {
+                color: #7f8c8d;
+            }
+            .notification-list-item.read .notification-message {
+                color: #7f8c8d;
+            }
+            /* Ajuste para que los botones de acción no estén deshabilitados en notificaciones leídas si su función es otra */
+            .notification-list-item.read .btn-action {
+            /* opacity: 0.7; // Descomentar si se desea un aspecto más tenue para todos los botones en leídas */
+            }
+            /* Solo el botón 'Leída' debe estar realmente deshabilitado */
+            .notification-list-item.read .btn-action[disabled] {
+                opacity: 0.7; /* Opacidad para el botón 'Leída' deshabilitado */
+            }
+            
+            
+            .notification-icon {
+                font-size: 1.8rem;
+                margin-right: 1rem;
+                flex-shrink: 0; /* Evita que el icono se encoja */
+            }
+            .notification-content {
+                flex-grow: 1;
+            }
+            .notification-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.25rem;
+            }
+            .notification-type {
+                font-weight: bold;
+                font-size: 1.1em;
+                color: #212529 !important; /* Color de texto más oscuro para el tipo */
+            }
+            .notification-message {
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+            .notification-meta {
+                font-size: 0.8rem;
+                color: #999;
+                margin-top: 0.5rem;
+                display: flex;
+                justify-content: end;
+                align-items: center;
+                flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+            }
+            .notification-meta .buttons-group {
+                display: flex;
+                gap: 0.5rem; /* Espacio entre los botones de acción */
+                margin-top: 0.5rem; /* Espacio superior para botones en pantallas pequeñas */
+            }
+            @media (min-width: 768px) { /* Solo para pantallas medianas y grandes */
+                .notification-meta .buttons-group {
+                    margin-top: 0; /* Elimina el margen superior si hay espacio */
+                }
+            }
+            
+            
+            /* Botones de acción general */
+            .btn-action-group .btn {
+                border-radius: 0.5rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+                transition: all 0.2s ease;
+            }
+            .btn-action-group .btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            }
+            
+            /* Estilos de las pestañas */
+            .nav-tabs .nav-link {
+                border: none;
+                border-bottom: 3px solid transparent;
+                font-weight: 600;
+                color: #6c757d !important;
+                padding: 0.75rem 1.5rem;
+                transition: all 0.3s ease;
+                border-radius: 0.75rem 0.75rem 0 0; /* Bordes redondeados en la parte superior */
+                background-color: #ffffff45  !important;
+            }
+            .nav-tabs .nav-link:hover{
+                 background-color: #ffffff45  !important;
+            }
+            .nav-tabs .nav-link.active {
+                color: #0d6efd;
+                border-bottom-color: #0d6efd; /* Subrayado azul para la pestaña activa */
+                background-color: #ffffff; /* Fondo blanco para la pestaña activa */
+            }
+            .nav-tabs {
+                border-bottom: 1px solid #dee2e6; /* Borde inferior para la barra de pestañas */
+                margin-bottom: 1.5rem;
+            }
+            .tab-content {
+                padding-top: 1rem;
+            }
+    
+    .panel-container.mx-auto(style="max-width: 900px;")
+            h2.mb-4.text-center.text-primary
+                    i.bi.bi-bell-fill.me-2
+                    | Centro de Notificaciones
+            .d-flex.justify-content-end.mb-4.btn-action-group
+                button.btn.btn-outline-primary.btn-sm
+                    i.bi.bi-check-all.me-1
+                    | Marcar todas como leídas
+                button.btn.btn-outline-secondary.btn-sm.ms-2
+                    i.bi.bi-trash-fill.me-1
+                    | Limpiar historial
+            
+            ul#notificationTabs.nav.nav-tabs(role="tablist")
+                li.nav-item(role="presentation")
+                    button#unread-tab.nav-link.active(data-bs-toggle="tab", data-bs-target="#unread", type="button", role="tab", aria-controls="unread", aria-selected="true")
+                        | Sin Leer
+                        span#notification-count.badge.bg-primary.ms-2
+                li.nav-item(role="presentation")
+                    button#read-tab.nav-link(data-bs-toggle="tab", data-bs-target="#read", type="button", role="tab", aria-controls="read", aria-selected="false")
+                        | Historial (Leídas)
+            
+            #notificationTabContent.tab-content
+                // Contenido de Notificaciones Sin Leer
+                #unread.tab-pane.fade.show.active(role="tabpanel", aria-labelledby="unread-tab")
+                   
+                    // Contenido de Notificaciones Leídas (Historial)
+                #read.tab-pane.fade(role="tabpanel", aria-labelledby="read-tab")

@@ -99,7 +99,7 @@ const authController = {
             //req.session.user = { id: newUserId, email: email, nombre: nombre };
             respuesta.msj = `¡Registro exitoso! Por favor, inicia secion y verifica tu email. `//podria decirle que verifique el correo electronico
             respuesta.ok = true
-            respuesta.url = `/#loginModal?msj=${respuesta.msj}`
+            respuesta.url = `#loginModal?msj=${respuesta.msj}`
             return res.status(200).json(respuesta)
 
         } catch (error) {

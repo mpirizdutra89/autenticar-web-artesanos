@@ -1,54 +1,5 @@
-/* document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const errorMessageDisplay = document.getElementById('errorMessage');
 
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Previene el envío por defecto del formulario
-
-        // Oculta cualquier mensaje de error anterior
-        errorMessageDisplay.style.display = 'none';
-        errorMessageDisplay.textContent = '';
-
-        const formData = new FormData(event.target);
-        const datos = {};
-        formData.forEach((value, key) => {
-            datos[key] = value;
-        });
-
-        console.log(datos); // Para depuración, puedes ver los datos que se envían
-
-        try {
-            const response = await fetch('/usuario/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos),
-                redirect: 'manual'
-            });
-
-            const responseData = await response.json();
-
-            if (responseData.ok === false) { // Si el JSON indica un fallo
-                errorMessageDisplay.textContent = responseData.msj || 'Error de credenciales.';
-                errorMessageDisplay.style.display = 'block';
-            } else {
-                if (responseData.ok === true) {
-                    window.location.href = responseData.url; // Asume éxito y redirige
-                } else {
-                    // Cualquier otro caso inesperado con JSON
-                    errorMessageDisplay.textContent = responseData.msj || 'Ocurrió un error inesperado en el servidor.';
-                    errorMessageDisplay.style.display = 'block';
-                }
-            }
-
-        } catch (error) {
-            console.error('Error de red al enviar el formulario:', error);
-            errorMessageDisplay.textContent = 'No se pudo conectar con el servidor. Inténtalo de nuevo.';
-            errorMessageDisplay.style.display = 'block';
-        }
-    });
-});
- */
-import { getElement, obtenerClaseTextoBootstrap } from './funcionesjs/utils.js';
+import { getElement, obtenerClaseTextoBootstrap, estaModalAbierto } from './funcionesjs/utils.js';
 const elements = {};
 
 function cacheDOMElements() {
@@ -203,7 +154,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     elements.errorMessageDisplay.style.display = 'block';
                 } else {
                     if (responseData.ok === true) {
-                        window.location.href = responseData.url; // Asume éxito y redirige
+
+                        //console.log(responseData.url)
+
+                        abrirLogin(true, responseData.url)
+
+
                     } else {
                         // Cualquier otro caso inesperado con JSON
                         elements.errorMessageDisplay.textContent = responseData.msj || 'Ocurrió un error inesperado en el servidor.';
@@ -217,10 +173,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 elements.errorMessageDisplay.style.display = 'block';
             }
 
-
-            // Opcional: Limpiar el formulario después del envío exitoso
             elements.registerForm.reset();
-            elements.registerForm.classList.remove('was-validated'); // Quitar los estilos de validación
+            elements.registerForm.classList.remove('was-validated');
+
         }
 
 
@@ -316,21 +271,14 @@ function VerificarCampos(data) {
     return true;
 }
 
-/* const abrirLogin = () => {
-    if (!elements.loginForm && !elements.registerModal) {
-        return;
-    }
-    if (window.location.hash) {
-        //const modalId = window.location.hash//.substring(1); // Elimina el '#'
-        const targetModal = document.querySelector(window.location.hash);
 
-        if (targetModal) {
-            const myModal = new bootstrap.Modal(targetModal);
-            myModal.show();
-        }
-    }
-} */
-const abrirLogin = () => {
+
+/* window.addEventListener('hashchange', function () {
+    abrirLogin()
+});
+ */
+
+const abrirLogin = (registro = false, url = '') => {
     // Estas comprobaciones iniciales están bien, pero asegúrate de que 'elements'
     // esté definido y contenga 'loginForm' y 'registerModal' si los usas.
 
@@ -338,9 +286,17 @@ const abrirLogin = () => {
         return;
     }
 
+    let hash
+    if (registro) {
+        hash = url
+    } else {
+        if (window.location.hash && !registro) {
+            hash = window.location.hash;
+        }
+    }
 
-    if (window.location.hash) {
-        const hash = window.location.hash; // Obtiene algo como '#loginmodal?msj=algo'
+    if (hash) {
+
 
         // 1. Separar el hash principal del query string dentro del hash
         // Primero, removemos el '#' inicial
@@ -368,13 +324,23 @@ const abrirLogin = () => {
             //console.log('Mensaje extraído:', mensaje); // Para depuración
         }
 
-
         // 3. Usar el modalId (que ahora es 'loginmodal' sin el query)
         const targetModal = document.getElementById(modalId); // Usamos getElementById ya que `modalId` es un ID
 
         if (targetModal) {
-            const myModal = new bootstrap.Modal(targetModal);
-            myModal.show();
+
+
+            if (estaModalAbierto() && registro) {
+
+                const registerModalInstance = bootstrap.Modal.getInstance(elements.registerModal);
+                if (registerModalInstance) {
+                    registerModalInstance.hide(); // Usar hide() para asegurar que se oculte
+                }
+
+            }
+            const targetModalInstance = bootstrap.Modal.getOrCreateInstance(targetModal);
+            targetModalInstance.show(); // Mostrar el modal objetivo
+
 
             // Aquí puedes usar el 'mensaje' si es necesario, por ejemplo, para mostrarlo en el modal
             if (mensaje) {

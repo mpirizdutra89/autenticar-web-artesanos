@@ -93,3 +93,46 @@ export function obtenerClaseTextoBootstrap(nombreColor) {
 
 
 
+export function estaModalAbierto(modalId = 'registerModal') {
+    const modalElement = document.getElementById(modalId);
+    if (!modalElement) {
+        console.warn(`No se encontró el elemento modal con ID: ${modalId}`);
+        return false;
+    }
+    // Verifica si el elemento tiene la clase 'show'
+    return modalElement.classList.contains('show');
+}
+
+
+export const NOTIFICACION_TYPE = Object.freeze({
+
+    SOLICITUD_AMISTAD: 'solicitud_amistad',
+    SOLICITUD_AMISTAD_RESP: 'solicitud_amistad_resp',
+    NUEVO_COMENTARIO: 'nuevo_comentario',
+    ALERTAS_SISTEMA: 'alertas_sistema',
+    OTRO_TIPO: 'otro_tipo',
+    isValid: (type) => Object.values(NOTIFICACION_TYPE).includes(type)
+});//ENUM('solicitud_amistad', 'solicitud_amistad_resp', 'nuevo_comentario',)
+
+
+export function formatStringWithUnderscores(str) {
+    if (!str || typeof str !== 'string') {
+        return ''; // Devuelve una cadena vacía si la entrada no es válida
+    }
+
+    // 1. Reemplaza todos los guiones bajos por espacios
+    // 2. Divide la cadena en palabras usando el espacio como delimitador
+    // 3. Itera sobre cada palabra para capitalizar la primera letra
+    const words = str.replace(/_/g, ' ').split(' ');
+
+    const formattedWords = words.map(word => {
+        if (word.length === 0) {
+            return ''; // Maneja el caso de múltiples espacios o palabras vacías
+        }
+        // Capitaliza la primera letra y concatena con el resto de la palabra
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    });
+
+    // Une las palabras formateadas de nuevo en una sola cadena
+    return formattedWords.join(' ');
+}

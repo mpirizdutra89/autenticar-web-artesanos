@@ -1,6 +1,4 @@
-// controllers/dashboardController.js
-// NO uses "const Notificacion = require('../models/Notificacion');"
-// Usa el nuevo import
+
 const Notificacion = require('../models/Notificacion'); // Importa tu nuevo modelo Notificacion (ahora es un objeto con funciones)
 
 const getDashboard = async (req, res) => {
@@ -10,26 +8,9 @@ const getDashboard = async (req, res) => {
         return res.redirect('/usuario/');
     }
 
-    let notificacionesNoLeidas = [];
-    try {
-        // 1. Obtener notificaciones no leídas de la DB usando la nueva función
-        notificacionesNoLeidas = await Notificacion.findAllUnread(user.id);
-
-        // 2. Si el usuario está conectado a Socket.IO, enviarle las notificaciones iniciales
-        const io = req.app.get('socketio');
-        if (io) {
-            // Envía las notificaciones como vienen directamente de mysql2 (ya son objetos JS)
-            io.to(`user_${user.id}`).emit('notificaciones_iniciales', notificacionesNoLeidas);
-        }
-
-    } catch (error) {
-        console.error('Error al obtener notificaciones no leídas:', error);
-    }
-
     res.render('dashboard', {
         title: 'Dashboard del Usuario',
         user: user,
-        notificaciones: notificacionesNoLeidas, // Ya son objetos JS, no necesitas .map(n => n.toJSON())
         message: req.query.message
     });
 };
@@ -104,6 +85,40 @@ const marcarNotificacionLeida = async (req, res) => {
     }
 };
 
+//Album
+
+
+/* const getAlbum = async (req, res) => {
+    const user = req.session.user;
+
+    if (!user) {
+        return res.redirect('/');
+    }
+
+    let notificacionesNoLeidas = [];
+    try {
+        // 1. Obtener notificaciones no leídas de la DB usando la nueva función
+        notificacionesNoLeidas = await Notificacion.findAllUnread(user.id);
+
+        // 2. Si el usuario está conectado a Socket.IO, enviarle las notificaciones iniciales
+        const io = req.app.get('socketio');
+        if (io) {
+            // Envía las notificaciones como vienen directamente de mysql2 (ya son objetos JS)
+            io.to(`user_${user.id}`).emit('notificaciones_iniciales', notificacionesNoLeidas);
+        }
+
+    } catch (error) {
+        console.error('Error al obtener notificaciones no leídas:', error);
+    }
+
+    res.render('dashboard', {
+        title: 'Dashboard del Usuario',
+        user: user,
+        notificaciones: notificacionesNoLeidas, // Ya son objetos JS, no necesitas .map(n => n.toJSON())
+        message: req.query.message
+    });
+};
+ */
 
 module.exports = {
     getDashboard,
