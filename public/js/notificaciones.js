@@ -13,7 +13,7 @@ const noNotificationsMessage = document.getElementById('no-notifications')
 //panel
 const notificacionUnread = document.getElementById("unread")
 const notificacionRead = document.getElementById("read")
-
+const btnTabRead = document.getElementById("read-tab")
 
 let unreadCount = 0;
 
@@ -50,17 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
             notificationList.prepend(crearItemPersonalisado(notif));
 
         } else if (notificacionUnread) {
-            let read = notif.leida // 1 si esta leido 0 no leido
-            let contenedor
-            if (read === 0) {
-                contenedor = notificacionUnread
-            } else {
-                contenedor = notificacionRead//este no  va a funcionar leer la nota
-            }
-            if (!contenedor) { return; }
-            // NOTA: la funcion no trae notificaciones leidas, deverias gnerar un funcion para el hitorial de la leidas
-            //aprte de lo otro    
-            contenedor.prepend(crearItemPersonalisadoPanel(notif));
+
+            if (!notificacionUnread) { return; }
+
+            notificacionUnread.prepend(crearItemPersonalisadoPanel(notif));
         }
 
         //panel
@@ -346,6 +339,32 @@ socket.on('notificaciones_iniciales', (notificaciones) => {
     console.log('Notificaciones iniciales recibidas por Socket.IO (reconexión/carga):', notificaciones);
     // Lógica para reemplazar/actualizar la lista completa de notificaciones si es necesario
 });
+
+
+btnTabRead.addEventListener('click', async (event) => {
+    try {
+        const response = await fetch('/panel-notificacion/notificaciones-read/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+       /*  if (data.success) {
+            const itemToUpdate = document.getElementById(`notif-${notificationId}`);
+            if (itemToUpdate) {
+                itemToUpdate.classList.remove('list-group-item-warning');
+                const markButton = itemToUpdate.querySelector('.mark-as-read-btn');
+                if (markButton) markButton.remove();
+                updateUnreadCount(-1);
+            }
+        } else {
+            console.error('Error al marcar como leída:', data.message);
+        } */
+    } catch (error) {
+        console.error('Error de red al marcar como leída:', error);
+    }
+})
 
 // notificationList.addEventListener('click', async (event) => {
 //     if (event.target.classList.contains('mark-as-read-btn')) {

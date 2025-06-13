@@ -34,6 +34,21 @@ const Notificacion = {
         const [rows] = await pool.execute(query, [id_usuario]);
         return rows;
     },
+    /**
+     * Obtiene todas las notificaciones  leídas para un usuario.
+     * @param {number} id_usuario - ID del usuario.
+     * @returns {Promise<Array<object>>} - Un array de objetos de notificación.
+     */
+    findAllread: async (id_usuario) => {
+        const query = `
+            SELECT id, id_usuario, tipo_notificacion, id_referencia, mensaje, leida, fecha_creacion
+            FROM notificaciones
+            WHERE id_usuario = ? AND leida = TRUE
+            ORDER BY fecha_creacion DESC
+        `;
+        const [rows] = await pool.execute(query, [id_usuario]);
+        return rows;
+    },
 
     /**
      * Marca una notificación específica como leída.

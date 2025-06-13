@@ -16,7 +16,20 @@ const GetnotificacionPage = async (req, res) => {
     });
 };
 
+const readNotificacion = async (req, res) => {
+    const user = req.session.user
+    if (!user) {
+        //responda que no se puede
+    }
+    const notificaciones_leer = await Notificacion.findAllread()
+    if (notificaciones_leer) {
+        //aca responder con el objeto o vacio o lleno y resivirlo en el front pedido por tab historial.
+    }
+    //llamo al c
+};
+
 
 module.exports = {
-    GetnotificacionPage
+    GetnotificacionPage,
+    readNotificacion
 };
