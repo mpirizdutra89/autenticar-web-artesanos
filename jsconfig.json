@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "lib": ["dom", "dom.iterable", "esnext"], // ¡Fundamental para tipos de DOM!
+    "allowJs": true,
+    "checkJs": true // <--- ¡Importante! Habilita la inferencia de tipos más fuerte
+  },
+  "exclude": ["node_modules"]
+}

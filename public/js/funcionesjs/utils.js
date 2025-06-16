@@ -11,6 +11,13 @@ export function getElement(id) {
     }
     return element;
 }
+export function getQueryElement(id) {
+    const element = document.querySelector(id);
+    if (!element) {
+        //console.warn(`Elemento con ID "${id}" no encontrado en el DOM. En caso de que la vista actual no lo use no abra fallos. Esto es solo un cartel de informacion`);
+    }
+    return element;
+}
 
 /**
  * Función de ayuda para obtener varios elementos del DOM por un selector.
@@ -135,4 +142,104 @@ export function formatStringWithUnderscores(str) {
 
     // Une las palabras formateadas de nuevo en una sola cadena
     return formattedWords.join(' ');
+}
+
+
+/**
+         * Muestra una alerta flotante que se desvanece automáticamente.
+         *
+         * @param {string} message - El mensaje a mostrar en la alerta.
+         * @param {string} type - El tipo de alerta (e.g., 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark').
+         * @param {string} position - La posición de la alerta ('top' para arriba-centro, 'bottom' para abajo-derecha).
+         * @param {number} duration - Duración en milisegundos antes de que la alerta empiece a desvanecerse (por defecto 3000ms).
+         */
+export function showFloatingAlert(message, type, position, duration = 3000) {
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} fade show`;
+    alertDiv.setAttribute('role', 'alert');
+    alertDiv.innerHTML = message;
+
+
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.zIndex = '1050';
+    alertDiv.style.width = '90%';
+    alertDiv.style.maxWidth = '400px';
+
+
+    if (position === 'top') {
+        alertDiv.style.top = '20px';
+        alertDiv.style.left = '50%';
+        alertDiv.style.transform = 'translateX(-50%)';
+        alertDiv.style.right = 'auto';
+    } else if (position === 'bottom') {
+        alertDiv.style.bottom = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.left = 'auto';
+        alertDiv.style.top = 'auto';
+        alertDiv.style.transform = 'none';
+    } else {
+        console.warn('Posición de alerta no válida. Usando "bottom" por defecto.');
+        alertDiv.style.bottom = '20px';
+        alertDiv.style.right = '20px';
+    }
+
+
+    document.body.appendChild(alertDiv);
+
+
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+
+
+        alertDiv.addEventListener('transitionend', function handler() {
+            alertDiv.remove();
+            alertDiv.removeEventListener('transitionend', handler);
+        }, { once: true });
+    }, duration);
+}
+
+
+export function isObjectEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+
+
+
+/**
+ * Verifica si todos los campos en un objeto de datos (obtenidos de FormData)
+ * están presentes y no vacíos.
+ * Considera "vacío" si es undefined, null, o una cadena vacía (después de quitar espacios).
+ *
+ * @param {Object} data - El objeto de datos (ej. 'datos' obtenido de FormData).
+ * @returns {boolean} - True si todos los campos encontrados en 'data' están presentes y no vacíos, false en caso contrario.
+ */
+export function VerificarCampos(data) {
+
+    const allFieldNames = Object.keys(data);
+
+
+    if (allFieldNames.length === 0) {
+        console.warn("Validación: El objeto de datos no contiene ningún campo.");
+
+        return true;
+    }
+
+    for (const fieldName of allFieldNames) {
+        const value = data[fieldName];
+
+        if (value === undefined || value === null) {
+            console.error(`Validación Fallida: El campo '${fieldName}' tiene un valor ausente o nulo.`);
+            return false;
+        }
+
+        if (typeof value === 'string') {
+            if (value.trim() === '') {
+                console.error(`Validación Fallida: El campo '${fieldName}' está vacío.`);
+                return false;
+            }
+        }
+    }
+
+    return true;
 }

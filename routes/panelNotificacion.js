@@ -9,5 +9,7 @@ const panel = require('../controllers/panelNotificacionController');
 
 //router.post('/album',)
 router.post('/notificaciones-read', panel.readNotificacion)
+router.post('/marcar-leida/:id', panel.marcarNotificacionLeida); // Ruta POST para marcar como leída
+
 router.get('/', panel.GetnotificacionPage);
 module.exports = router;

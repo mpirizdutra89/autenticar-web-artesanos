@@ -1,18 +1,26 @@
 .modal.fade#createAlbumModal(tabindex="-1", aria-labelledby="createAlbumModalLabel", aria-hidden="true")
-    .modal-dialog
+    .modal-dialog.modal-lg
         .modal-content
             .modal-header.bg-dark.text-white
                 h5.modal-title#createAlbumModalLabel Crear/Editar Álbum
                 button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Close")
-            .modal-body
-                form
+            .modal-body                
+                form#CrearAlbumNew.p-4.border.rounded.shadow-sm.bg-white.mx-auto.needs-validation(enctype="multipart/form-data", style="max-width: 700px;", novalidate)
+                    h3.text-center.mb-3 
                     .mb-3
-                        label.form-label(for="albumTitle") Título del Álbum
-                        input.form-control#albumTitle(type="text", placeholder="Ej: Mi primera colección")
+                        label.form-label(for="titulo") Título del Álbum:
+                        input#titulo.form-control(type="text", name="titulo", pattern="^[a-zA-Z0-9 ]{6,30}$" ,placeholder="Mi primera colección",autocomplete="off", required)
+                        .invalid-feedback
+                            | El titulo es obligatorio, solo una combinación de letras y numeros, (entre 6 a 30 caracteres)
                     .mb-3
-                        label.form-label(for="albumDescription") Descripción
-                        textarea.form-control#albumDescription(rows="3", placeholder="Una breve descripción de tu álbum...")
+                        label.form-label(for="descripcion") Descripción:
+                        textarea#descripcion.form-control(name="descripcion", autocomplete="off",rows="3",required)
+                        .invalid-feedback
+                            | La descripcion es obligatorio ( entre 10 a 200 caracteres)
+                    hr.my-4
+                    //h3.text-center.mb-3 Foto de Portada
                     .mb-3
-                        label.form-label(for="albumCover") Subir Portada (Opcional)
-                        input.form-control#albumCover(type="file", accept="image/*")
-                    button.btn.btn-custom-primary.w-100(type="submit") Guardar Álbum
+                        #coverCropperContainer.mt-3.p-3.border.rounded                                             
+                        #formGlobalError.invalid-feedback.d-block(style="display:none;")
+                    .d-grid.mt-5
+                        button.btn.btn-success.btn-lg(type="submit") Guardar Álbum                    

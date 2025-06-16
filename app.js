@@ -16,9 +16,10 @@ const { createAdapter } = require('@socket.io/redis-adapter'); // Importa el ada
 const inicioRoutes = require('./routes/inicio');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
-
+const albumRoutes = require('./routes/albumRoutes')
 const panelNotificacionesRoutes = require('./routes/panelNotificacion');
-
+//multer
+const { multerErrorHandler } = require('./middleware/uploadMiddleware');
 // Importa el middleware de autenticación notificacion
 const { isAuthenticated, loadUserIntoView } = require('./middleware/authMiddleware');
 const loadNotificationsMiddleware = require('./middleware/notificationMiddleware'); // Importa tu nuevo middleware
@@ -31,6 +32,7 @@ const HOST = process.env.HOST ? process.env.HOST : "localhost"
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
 app.use('/bootstrap-icons', express.static(path.join(__dirname, 'node_modules/bootstrap-icons/font')))// Esto expone la carpeta 'node_modules/bootstrap-icons/font' bajo la ruta '/bootstrap-icons'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.set('view engine', 'pug');
@@ -95,8 +97,14 @@ app.set('views', path.join(__dirname, 'views'));
     // Rutas del dashboard (protegidas por el middleware isAuthenticated)
     app.use('/dashboard', isAuthenticated, dashboardRoutes);
     app.use('/panel-notificacion', isAuthenticated, panelNotificacionesRoutes)
-    app.use('/', inicioRoutes);
+    app.use('/album', isAuthenticated, albumRoutes)
 
+
+
+
+    //manejo de errores gloabales
+    app.use(multerErrorHandler);
+    app.use('/', inicioRoutes);
     // Este middleware debe ir DESPUÉS de TODAS tus rutas definidas
     app.use((req, res, next) => {
 

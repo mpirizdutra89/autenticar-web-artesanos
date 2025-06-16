@@ -1,157 +1,127 @@
-const manageAlbumWorksModal = document.getElementById('manageAlbumWorksModal');
+import { getQueryElement, VerificarCampos } from './funcionesjs/utils.js';
 
-manageAlbumWorksModal.addEventListener('show.bs.modal', async event => {
-    const button = event.relatedTarget;
-    const albumTitle = button.getAttribute('data-album-title');
-    const albumId = button.getAttribute('data-album-id');
 
-    document.getElementById('currentAlbumTitle').textContent = albumTitle;
+import { initializeCropper } from './funcionesjs/coverCropperHandler.js';
 
-    const currentWorksList = document.getElementById('currentWorksList');
-    currentWorksList.innerHTML = '';
+/**
+ * @typedef {object} CachedDOMElements
+ * @property {HTMLDivElement | null} coverCropperContainer // Solo un contenedor general
+ * // Puedes añadir un contenedor para perfil si lo necesitas:
+ * // @property {HTMLDivElement | null} profileCropperContainer
 
-    try {
-        const response = await fetch(`/api/albums/${albumId}/works`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const worksForThisAlbum = await response.json();
+ * @property {HTMLElement | null} createAlbumModal
+ * @property {HTMLFormElement | null} CrearAlbumNewForm
+ * @property {HTMLBodyElement} body
+ */
 
-        if (worksForThisAlbum.length > 0) {
-            worksForThisAlbum.forEach(work => {
-                const workItem = document.createElement('div');
-                workItem.classList.add('work-item');
-                workItem.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <img src="${work.src}" class="work-thumbnail" alt="${work.title}">
-                        <span>${work.title}</span>
-                    </div>
-                    <button class="btn btn-sm btn-danger" data-work-id="${work.id}"><i class="bi bi-trash"></i> Eliminar</button>
-                `;
-                currentWorksList.appendChild(workItem);
+/** @type {CachedDOMElements} */
+const elements = {};
+let coverCropperData = null; // Contendrá { croppedImageBlob: {value: Blob}, reset: Function }
 
-                workItem.querySelector('.btn-danger').addEventListener('click', async (e) => {
-                    if (confirm(`¿Estás seguro de que quieres eliminar la obra "${work.title}"?`)) {
-                        try {
-                            const deleteResponse = await fetch(`/api/albums/${albumId}/works/${work.id}`, {
-                                method: 'DELETE'
-                            });
 
-                            if (!deleteResponse.ok) {
-                                throw new Error(`HTTP error! status: ${deleteResponse.status}`);
-                            }
+function cacheDOMElements() {
 
-                            const result = await deleteResponse.json();
-                            console.log(result.message);
-                            workItem.remove(); // Eliminar visualmente
 
-                            if (currentWorksList.children.length === 1 && currentWorksList.querySelector('.empty-state')) {
-                                currentWorksList.querySelector('.empty-state').classList.remove('d-none');
-                            } else if (currentWorksList.children.length === 0) { // Si ya no quedan obras
-                                const emptyStateDiv = document.createElement('div');
-                                emptyStateDiv.classList.add('empty-state');
-                                emptyStateDiv.innerHTML = `<i class="bi bi-folder-x"></i><p>Este álbum no tiene obras aún. ¡Añade algunas!</p>`;
-                                currentWorksList.appendChild(emptyStateDiv);
-                            }
-                        } catch (error) {
-                            console.error("Error al eliminar la obra:", error);
-                            alert("Hubo un error al eliminar la obra.");
-                        }
-                    }
-                });
-            });
-            currentWorksList.querySelector('.empty-state')?.classList.add('d-none'); // Ocultar si hay obras
-        } else {
-            currentWorksList.innerHTML = `
-                <div class="empty-state">
-                    <i class="bi bi-folder-x"></i>
-                    <p>Este álbum no tiene obras aún. ¡Añade algunas!</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error("Error al cargar las obras del álbum:", error);
-        currentWorksList.innerHTML = `<div class="empty-state text-danger"><i class="bi bi-exclamation-triangle"></i><p>Error al cargar las obras.</p></div>`;
+    // SOLO el contenedor principal para el cropper de portada
+    elements.coverCropperContainer = getQueryElement('#coverCropperContainer');
+
+    elements.createAlbumModal = getQueryElement("#createAlbumModal");
+    elements.CrearAlbumNewForm = getQueryElement("#CrearAlbumNew");
+    elements.body = document.body;
+
+    // Validación mínima
+    if (!elements.CrearAlbumNewForm || !elements.coverCropperContainer) {
+        console.error('Uno o más elementos cruciales del DOM no fueron encontrados. Revisa tus IDs HTML.');
+        return false;
+    }
+    return true;
+}
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!cacheDOMElements()) {
+        return;
     }
 
-    document.getElementById('workUpload').value = '';
-    document.getElementById('workTitle').value = '';
-    document.getElementById('workDescription').value = '';
-});
+    // --- Inicialización del Cropper de Portada ---
+    coverCropperData = initializeCropper(
+        elements.coverCropperContainer,
+        'cover' // <-- Aquí especificas el tipo de cropper: 'cover' o 'profile'
+    );
 
-document.querySelector('#pills-add-works form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const workUpload = document.getElementById('workUpload');
-    const workTitle = document.getElementById('workTitle').value;
-    const workDescription = document.getElementById('workDescription').value;
-    const currentAlbumId = document.getElementById('manageAlbumWorksModal').querySelector('#currentAlbumTitle').dataset.albumId; // Obtener el ID del álbum actual
+    // --- Lógica de envío del formulario completo ---
+    elements.CrearAlbumNewForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formGlobalErrorElement = getQueryElement('#formGlobalError');
 
-    if (workUpload.files.length > 0) {
-        const formData = new FormData();
-        for (let i = 0; i < workUpload.files.length; i++) {
-            formData.append('files', workUpload.files[i]);
+
+        if (formGlobalErrorElement) formGlobalErrorElement.style.display = 'none';
+
+
+        const formData = new FormData(this);
+
+        if (!elements.CrearAlbumNewForm.checkValidity()) {
+
+            elements.CrearAlbumNewForm.classList.add('was-validated');
+            console.log('Formulario de registro inválido.');
+            return;
         }
-        formData.append('title', workTitle);
-        formData.append('description', workDescription);
+
+
+        // Validación: Hacer obligatoria la imagen de portada
+        console.log(coverCropperData.croppedImageBlob.value)
+        if (!coverCropperData.croppedImageBlob.value) {
+            if (formGlobalErrorElement) {
+                formGlobalErrorElement.textContent = 'Por favor, selecciona y recorta una imagen de portada.';
+                formGlobalErrorElement.style.display = 'block';
+            } else {
+                console.error('Elemento de error global no encontrado.');
+            }
+            return;
+        }
+
+        formData.append('album_initial_cover', coverCropperData.croppedImageBlob.value, 'cover.jpeg');
+        console.log('Imagen de portada recortada (Blob) añadida al FormData.');
+
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
 
         try {
-            // Aquí, en un entorno real, usarías un middleware como 'multer' en Express
-            // para procesar el formData y guardar los archivos.
-            // Para esta simulación, solo enviamos un JSON simple.
-            const response = await fetch(`/api/albums/${currentAlbumId}/works`, {
+            const response = await fetch('/album/create-album', { // Asegúrate de que esta URL sea la correcta
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json' // Para la simulación, aunque para archivos reales sería 'multipart/form-data'
-                },
-                body: JSON.stringify({ // Enviamos solo metadatos para la simulación
-                    filesCount: workUpload.files.length,
-                    title: workTitle,
-                    description: workDescription
-                })
-                // body: formData // Esto sería lo real con Multer
+                body: formData
             });
+            console.log(response)
+            if (response.ok) {
+                const result = await response.json();
+                console.log("exito")
+                console.log(result);
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+
+                elements.CrearAlbumNewForm.reset();
+                coverCropperData.reset(); // Usamos la función de reseteo proporcionada por initializeCropper
+
+            } else {
+                const errorData = await response.json();
+                console.error('Error en la operación:', errorData);
+                if (formGlobalErrorElement) {
+                    formGlobalErrorElement.textContent = 'Error al procesar la solicitud: ' + (errorData.message || 'Desconocido');
+                    formGlobalErrorElement.style.display = 'block';
+                } else {
+                    //alert('Error al procesar la solicitud: ' + (errorData.message || 'Desconocido'));
+                }
             }
-
-            const result = await response.json();
-            alert(`Mensaje del servidor: ${result.message}`);
-
-            // Simular recarga de obras si se subieron con éxito
-            const manageAlbumWorksModalInstance = bootstrap.Modal.getInstance(manageAlbumWorksModal);
-            if (manageAlbumWorksModalInstance) {
-                manageAlbumWorksModalInstance.hide(); // Cerrar el modal
-                // Y podrías disparar un evento o recargar la página para ver los cambios si el backend persiste
-            }
-            // O directamente:
-            // await fetchAndRenderWorks(currentAlbumId); // Si tuvieras una función para esto
-            document.getElementById('workUpload').value = '';
-            document.getElementById('workTitle').value = '';
-            document.getElementById('workDescription').value = '';
-
         } catch (error) {
-            console.error("Error al subir obras:", error);
-            alert("Hubo un error al subir las obras. Inténtalo de nuevo.");
+            console.error('Error de red al enviar datos:', error);
+            if (formGlobalErrorElement) {
+                formGlobalErrorElement.textContent = 'Error de conexión o de red.';
+                formGlobalErrorElement.style.display = 'block';
+            } else {
+                //  alert('Error de conexión o de red.');
+            }
         }
-    } else {
-        alert('Por favor, selecciona al menos un archivo para subir.');
-    }
-});
-
-// Lógica para el modal de Crear/Editar Álbum
-const createAlbumModal = document.getElementById('createAlbumModal');
-createAlbumModal.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const albumTitle = document.getElementById('albumTitle').value;
-    const albumDescription = document.getElementById('albumDescription').value;
-    const albumCover = document.getElementById('albumCover').files[0];
-
-    // Lógica para guardar el álbum (simulado)
-    console.log("Guardando álbum:", { title: albumTitle, description: albumDescription, cover: albumCover?.name });
-    alert(`Álbum "${albumTitle}" guardado exitosamente (simulado).`);
-
-    // Cerrar el modal
-    const modalInstance = bootstrap.Modal.getInstance(createAlbumModal);
-    modalInstance.hide();
+    });
 });

@@ -1,5 +1,86 @@
 extends layout
+block styles
+  link(rel='stylesheet', href='/css/croppie.min.css')
+  style.
+        .cropper-container-wrapper {
+            /* Clase genérica para ambos croppers */
+            width: 300px;
+            /* Ancho base */
+            height: 300px;
+            /* Alto base */
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            background-color: #f8f8f8;
+            display: none;
+            /* Controlado por JS */
+            position: relative;
+        }
+
+        /* Ajuste para el cropper de portada (rectangular) */
+        #cropperWrapperParentCover {
+            width: 600px;
+            /* Ancho para portada */
+            height: 150px;
+            /* Alto para portada (600/4 = 150) */
+        }
+
+        /* Estilo para la imagen de perfil recortada */
+        #profileImagePreview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            /* Circular */
+            object-fit: cover;
+            border: 3px solid #007bff;
+            display: none;
+            /* Controlado por JS */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Estilo para la imagen de portada recortada */
+        #coverImagePreview {
+            width: 400px;
+            /* Ancho de la vista previa de portada */
+            height: 200px;
+            /* Alto de la vista previa de portada */
+            object-fit: cover;
+            border: 3px solid #28a745;
+            /* Borde verde */
+            display: none;
+            /* Controlado por JS */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Centrar textos de previsualización */
+        .preview-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.25rem;
+            /* fs-4 en Bootstrap */
+            display: none;
+            /* Controlado por JS */
+        }
+
+        .preview-subtext {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #6c757d;
+            /* text-muted en Bootstrap */
+            display: none;
+            /* Controlado por JS */
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            text-align: center;
+        }
 block content
+  #dashboardTabsContent.tab-content
+      
       .tab-pane.fade.show.active#albums(role="tabpanel", aria-labelledby="albums-tab")
         .d-flex.justify-content-between.align-items-center.mb-4
           h3.mb-0.text-section-title Gestiona tus Álbumes Propios
@@ -26,47 +107,11 @@ block content
                       i.bi.bi-pencil
                     button.btn.btn-sm.btn-danger(title="Eliminar Álbum")
                       i.bi.bi-trash
-          .col
-            .card.h-100.shadow-sm
-              img.card-img-top.card-img-top-fit(src="/img/4.jpg", alt="Portada de Álbum")
-              .card-body
-                h5.card-title Retratos en la Naturaleza
-                p.card-text.text-muted.mb-2
-                  small 8 Obras | Última actualización: 3 días
-                p.card-text Explorando la conexión entre el ser humano y el entorno natural a través del retrato.
-                .d-flex.justify-content-between.align-items-center.mt-3
-                  button.btn.btn-sm.btn-outline-custom-primary.me-2(type="button", data-bs-toggle="modal", data-bs-target="#albumViewerModal", data-album-id="naturePortraits") Ver Álbum
-                  div
-                    button.btn.btn-sm.btn-secondary.me-2(data-bs-toggle="modal", data-bs-target="#manageAlbumWorksModal", data-album-title="Retratos en la Naturaleza", data-album-id="naturePortraits")
-                      i.bi.bi-images
-                      |  Administrar Obras
-                    button.btn.btn-sm.btn-info.text-white.me-2(data-bs-toggle="modal", data-bs-target="#createAlbumModal", title="Editar Álbum")
-                      i.bi.bi-pencil
-                    button.btn.btn-sm.btn-danger(title="Eliminar Álbum")
-                      i.bi.bi-trash
-          .col
-            .card.h-100.shadow-sm
-              img.card-img-top.card-img-top-fit(src="/img/6.jpg", alt="Portada de Álbum")
-              .card-body
-                h5.card-title Abstracción y Color
-                p.card-text.text-muted.mb-2
-                  small 12 Obras | Última actualización: 2 semanas
-                p.card-text Pinturas abstractas que juegan con la luz, las formas y una paleta de colores vibrantes.
-                .d-flex.justify-content-between.align-items-center.mt-3
-                  button.btn.btn-sm.btn-outline-custom-primary.me-2(type="button", data-bs-toggle="modal", data-bs-target="#albumViewerModal", data-album-id="abstractColor") Ver Álbum
-                  div
-                    button.btn.btn-sm.btn-secondary.me-2(data-bs-toggle="modal", data-bs-target="#manageAlbumWorksModal", data-album-title="Abstracción y Color", data-album-id="abstractColor")
-                        i.bi.bi-images
-                        |  Administrar Obras
-                    button.btn.btn-sm.btn-info.text-white.me-2(data-bs-toggle="modal", data-bs-target="#createAlbumModal", title="Editar Álbum")
-                        i.bi.bi-pencil
-                    button.btn.btn-sm.btn-danger(title="Eliminar Álbum")
-                        i.bi.bi-trash
-
-      include ./partials/create_album_modal.pug
-      include ./partials/manage_album_works_modal.pug
+          
+  include ./partials/create_album_modal.pug
+  include ./partials/manage_album_works_modal.pug
 
 
 block scripts
-    script(src="/js/albums.js")
-    //block scripts deve estar afuera del block content
+    script( src="/js/funcionesjs/croppie.min.js")
+    script(type='module' src="/js/albums.js")

@@ -2,7 +2,7 @@
 const socket = io();
 
 
-import { NOTIFICACION_TYPE, formatStringWithUnderscores } from './funcionesjs/utils.js';
+import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isObjectEmpty } from './funcionesjs/utils.js';
 //#notificacion-container   #nrNotificacion
 
 const notificationList = document.getElementById('notification-list-container')
@@ -51,13 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else if (notificacionUnread) {
 
-            if (!notificacionUnread) { return; }
-
             notificacionUnread.prepend(crearItemPersonalisadoPanel(notif));
         }
 
         //panel
     });
+
+    if (isObjectEmpty(initialNotifications)) {
+        notificacionUnread.innerHTML = `
+                     <p class="text-center text-muted mt-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> ¡No tienes notificaciones sin leer!
+                    </p> `
+    }
+
     if (notificationList) {
         notificationList.appendChild(crearItemPersonalisado(null, true))
     }
@@ -70,19 +76,19 @@ document.addEventListener('DOMContentLoaded', () => {
         noNotificationsMessage.style.display = 'none';
 
     }
-    inicializarTooltips();
+    // inicializarTooltips();
 });
 
 // NOTA: la funcion no trae notificaciones leidas, deverias gnerar un funcion para el hitorial de la leidas
 //aprte de lo otro
 function crearItemPersonalisadoPanel(notif) {
     let tipo = notif.tipo_notificacion
-
+    let leida = notif.leida
 
 
     const notificationItem = document.createElement('div')
     notificationItem.id = `notif-${notif.id}`
-    notificationItem.className = notif.leida === 0 ? 'notification-list-item unread' : 'notification-list-item read'
+    notificationItem.className = leida === 0 ? 'notification-list-item unread' : 'notification-list-item read'
     notificationItem.innerHTML = ''
     // <button class="btn btn-outline-success me-2 mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}">Aceptar</button>
 
@@ -101,7 +107,7 @@ function crearItemPersonalisadoPanel(notif) {
                             </p>
                             <div class="notification-meta">
                                
-                                <div class="buttons-group">
+                                <div class="buttons-group" style="display:${leida === 0 ? 'block' : 'none'}">
                                      <button class="btn btn-md btn-outline-success rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" >Aceptar</button>
                                     <button class="btn btn-md btn-outline-danger rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}"  data-tipo="${tipo}">Rechazar</button>
                                 </div>
@@ -122,7 +128,7 @@ function crearItemPersonalisadoPanel(notif) {
                             </p>
                             <div class="notification-meta">
                                
-                                <div class="buttons-group">
+                                <div class="buttons-group" style="display:${leida === 0 ? 'block' : 'none'}" >
                                      <button class="btn btn-md btn-outline-success rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}" data-tipo="${tipo}"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Marcar como leida" ><i class="bi bi-check-square-fill"></i></button>
                                     
                                 </div>
@@ -143,7 +149,7 @@ function crearItemPersonalisadoPanel(notif) {
                             </p>
                             <div class="notification-meta">
                                
-                                <div class="buttons-group">
+                                <div class="buttons-group" style="display:${leida === 0 ? 'block' : 'none'}">
                                     <button class="btn btn-md btn-outline-success rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" >ver</button>
                        
                                 </div>
@@ -165,7 +171,7 @@ function crearItemPersonalisadoPanel(notif) {
                             </p>
                             <div class="notification-meta">
                                
-                                <div class="buttons-group">
+                                <div class="buttons-group" style="display:${leida === 0 ? 'block' : 'none'}">
                                      <button class="btn btn-md btn-outline-success rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}" data-tipo="${tipo}"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Marcar como leida" ><i class="bi bi-check-square-fill"></i></button>
                                     
                                 </div>
@@ -272,7 +278,7 @@ function crearItemPersonalisado(notif, final = false) {
         }
 
         default: {
-            notificationItem.innerHTML += "<a class='dropdown-item text-center text-warning' href='#'> Ver todas las notificaciones</a>"
+            notificationItem.innerHTML += "<a class='dropdown-item text-center text-warning' href='./panel-notificacion/'> Ver todas las notificaciones</a>"
             break
         }
 
@@ -340,60 +346,89 @@ socket.on('notificaciones_iniciales', (notificaciones) => {
     // Lógica para reemplazar/actualizar la lista completa de notificaciones si es necesario
 });
 
+if (notificacionUnread) {
+    btnTabRead.addEventListener('click', async (event) => {
+        try {
 
-btnTabRead.addEventListener('click', async (event) => {
-    try {
-        const response = await fetch('/panel-notificacion/notificaciones-read/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const data = await response.json();
-       /*  if (data.success) {
-            const itemToUpdate = document.getElementById(`notif-${notificationId}`);
-            if (itemToUpdate) {
-                itemToUpdate.classList.remove('list-group-item-warning');
-                const markButton = itemToUpdate.querySelector('.mark-as-read-btn');
-                if (markButton) markButton.remove();
-                updateUnreadCount(-1);
+            const response = await fetch('/panel-notificacion/notificaciones-read/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+
+            if (data.ok) {
+                const listaLeida = data.data
+
+                if (listaLeida) {
+                    notificacionRead.innerHTML = ''
+                    listaLeida.forEach(notif => {
+
+                        if (!notificacionRead) {
+                            return;
+                        }
+
+                        notificacionRead.prepend(crearItemPersonalisadoPanel(notif));
+
+
+                    });
+                }
+
+
             }
-        } else {
-            console.error('Error al marcar como leída:', data.message);
-        } */
-    } catch (error) {
-        console.error('Error de red al marcar como leída:', error);
-    }
-})
+            if (!data.ok) {
 
-// notificationList.addEventListener('click', async (event) => {
-//     if (event.target.classList.contains('mark-as-read-btn')) {
-//         const notificationId = event.target.dataset.id;
-//         try {
-//             const response = await fetch(`/dashboard/marcar-leida/${notificationId}`, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                 },
-//             });
-//             const data = await response.json();
-//             if (data.success) {
-//                 const itemToUpdate = document.getElementById(`notif-${notificationId}`);
-//                 if (itemToUpdate) {
-//                     itemToUpdate.classList.remove('list-group-item-warning');
-//                     const markButton = itemToUpdate.querySelector('.mark-as-read-btn');
-//                     if (markButton) markButton.remove();
-//                     updateUnreadCount(-1);
-//                 }
-//             } else {
-//                 console.error('Error al marcar como leída:', data.message);
-//             }
-//         } catch (error) {
-//             console.error('Error de red al marcar como leída:', error);
-//         }
-//     }
-// });
+                notificacionRead.innerHTML = `
+                    <p class="text-center text-muted mt-4">
+                        <i i class="bi bi-archive-fill me-2" ></i> Tu historial de notificaciones leídas está vacío.
+                    </p > `
 
+            }
+
+        } catch (error) {
+            console.error('No se pudo listar las notifiaciones leidas', error);
+        }
+    })
+
+    notificacionUnread.addEventListener('click', async (event) => {
+        const btnActual = event.target.closest('.mark-as-read-btn')
+        if (btnActual) {
+
+            const notificationId = btnActual.dataset.id;
+            const tipoNotificacion = btnActual.dataset.tipo
+            const itemToUpdate = document.getElementById(`notif-${notificationId}`);
+
+            if (tipoNotificacion !== NOTIFICACION_TYPE.SOLICITUD_AMISTAD && tipoNotificacion !== NOTIFICACION_TYPE.NUEVO_COMENTARIO) {
+
+                try {
+                    const response = await fetch(`/panel-notificacion/marcar-leida/${notificationId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const data = await response.json();
+                    if (data.ok) {
+
+                        if (itemToUpdate) {
+
+                            itemToUpdate.remove();
+                            updateUnreadCount(-1);
+                            showFloatingAlert('La notificacion fue leida', 'success', 3000)
+
+                        }
+                    } else {
+                        console.error('Error al marcar como leída:', data.message);
+                        showFloatingAlert('La notificacion no se pudo dar de baja', danger, 3000)
+                    }
+                } catch (error) {
+                    console.error('Error de red al marcar como leída:', error);
+                }
+            }
+        }
+    });
+}
 function inicializarTooltips() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));

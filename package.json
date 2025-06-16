@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "mail":"nodemon config/testEnvio.js"
+    "mail": "nodemon config/testEnvio.js"
   },
   "author": "",
   "license": "ISC",
@@ -28,7 +28,8 @@
     "pug": "^3.0.3",
     "redis": "^5.1.0",
     "sequelize": "^6.37.7",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

@@ -1,0 +1,18 @@
+extends layout
+block content
+      .tab-pane.fade.show.active#albums(role="tabpanel", aria-labelledby="albums-tab")
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h3.mb-0.text-section-title 
+          button.btn.btn-primary(type="button", data-bs-toggle="modal", data-bs-target="#addObras")
+            ibi.bi-plus-circle-fill.me-2
+            | Añadir obras
+        .row.row-cols-md-12
+        
+
+      include ./partials/create_album_modal.pug
+      include ./partials/manage_album_works_modal.pug
+
+
+block scripts
+    script(src="/js/albums.js")
+    //block scripts deve estar afuera del block content
