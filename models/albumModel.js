@@ -3,12 +3,39 @@ const pool = require('../db');
 class AlbumModel {
 
     static tabla = 'albums'
+    static tabla_img = 'images'
+
+    static async imagenesByIdAlbum(id) {
+        try {
+            const [rows] = await pool.execute(`SELECT * FROM ${AlbumModel.tabla_img}  WHERE albums_idAlbums = ?`, [id]);
+            // if (rows && rows[0]) { return rows[0]; } // poisblemnte no haga falta [0] , pero como funciona no lo toco.. no tengo tiempo pra estas boludesde
+            return rows || [];
+        } catch (error) {
+            console.error('Error al buscar album por ID:', error);
+            throw error;
+        }
+    }
+
     static async findById(id) {
         try {
             const [rows] = await pool.execute(`SELECT * FROM ${AlbumModel.tabla} WHERE idAlbum = ?`, [id]);
-            return rows[0];
+            // if (rows && rows[0]) { return rows[0]; } // poisblemnte no haga falta [0] , pero como funciona no lo toco.. no tengo tiempo pra estas boludesde
+            return rows || [];
         } catch (error) {
             console.error('Error al buscar album por ID:', error);
+            throw error;
+        }
+    }
+
+    static async all(user_id, tipo = 'normal') {
+        try {
+
+            const [results] = await pool.execute('CALL loadAlbumUser(?,?)', [user_id, tipo]);
+            if (results && results[0]) { return results[0]; }
+            return [];
+
+        } catch (error) {
+            console.error('No hay albums para el usuario actual', error);
             throw error;
         }
     }
@@ -26,11 +53,11 @@ class AlbumModel {
 
 
     static async create(user_id, tipo = 'normal', titulo, descripcion, portada) {
-        console.log(`INSERT INTO ${AlbumModel.tabla} (usuarios_id, tipo_album,titulo, descripcion,portada) VALUES (${user_id},${tipo},${titulo},${descripcion},${portada})`)
+        //  console.log(`INSERT INTO ${AlbumModel.tabla} (usuarios_id, tipo_album,titulo, descripcion,portada) VALUES (${user_id},${tipo},${titulo},${descripcion},${portada})`)
         try {
 
             const [result] = await pool.execute(
-                `INSERT INTO ${AlbumModel.tabla} (usuarios_id, tipo_album,titulo, descripcion,portada) VALUES (?,?,?,?,?)`,
+                `INSERT INTO ${AlbumModel.tabla} (usuarios_id,tipo_album,titulo, descripcion,portada) VALUES (?,?,?,?,?)`,
                 [user_id, tipo, titulo, descripcion, portada]
             );
             return result.insertId;

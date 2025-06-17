@@ -64,6 +64,7 @@ export function resetCropperUI(refs) {
 
 }
 
+
 /**
  * Maneja el evento de cambio del input de archivo para la imagen.
  * Inicializa el cropper con la imagen seleccionada y el tipo de plantilla elegido.

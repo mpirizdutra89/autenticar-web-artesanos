@@ -3,9 +3,10 @@ const fs = require('fs');
 const UPLOAD_DIR = path.join(__dirname, '../uploads');
 const activeTab = 'albums'
 const AlbumModel = require('../models/albumModel');
+const { resolveObjectURL } = require('buffer');
 
 
-const getpageAlbum = async (req, res) => {
+const getpageAlbum = (req, res) => {
 
     res.render('album', {
         title: 'Gestion Album',
@@ -27,9 +28,62 @@ const getPageAdministrarAlbum = async (req, res) => {
     });
 };
 
+const getAlbumImages = async (req, res) => {
+    const respuesta = {
+        ok: false,
+        albumsData: [],
+        msj: 'No hay fotos para este album'
+    }
+    try {
+        const albumId = req.params.id;
+        if (!albumId) {
+            respuesta.ok = false;
+            respuesta.msj = 'El album esta corrupto'
+            return res.status(400).json(respuesta);
+        }
+
+
+        const obras = await AlbumModel.imagenesByIdAlbum(albumId);
+        //console.log(obras)
+        if (obras.length === 0) {
+            respuesta.ok = false
+            return res.status(404).json(respuesta);
+        }
+
+        respuesta.ok = true
+        respuesta.msj = `Se recuperaron ${obras.length} obras del album ${albumId}`
+        respuesta.albumsData = obras
+        res.status(200).json(respuesta);
+
+    } catch (error) {
+        console.error('Error al obtener imágenes del álbum:', error);
+        respuesta.ok = false
+        respuesta.msj = 'Error interno del servidor al obtener imágenes.'
+        res.status(500).json(respuesta);
+    }
+}
+
+
+const getAdministrarObras = async (req, res) => {
+
+    const respuesta = {
+        ok: false,
+        albumsData: [],
+        message: 'Falta la referencia del album'
+    }
+    const albumId = req.params.id;
+    const obras = await AlbumModel.imagenesByIdAlbum(albumId)
+
+    res.render('album_administrar', {
+        title: 'Administrar Album',
+        panel_notificacion: true,
+        activeTab: activeTab,
+        albumsData: obras
+    });
+}
 // controllers/userController.js
 
-const createAlbum2 = async (req, res) => {
+/* const createAlbum2 = async (req, res) => {
 
     console.log('Datos del formulario de registro:', req.body); // Otros campos de texto del formulario
     console.log('Archivos subidos por Multer:', req.files); // Archivos de imagen
@@ -85,7 +139,7 @@ const createAlbum2 = async (req, res) => {
             msj: 'No se pudo resgistrar el album, fallo interno',
         });
     }
-};
+}; */
 
 const createAlbum = async (req, res) => {
 
@@ -97,13 +151,13 @@ const createAlbum = async (req, res) => {
 
         const userId = user.id;
         if (!user) {
-            console.log(' no hau user id:', userId)
+
             return res.status(401).json({ ok: false, msj: 'Acceso no autorizado. ID de usuario no disponible.' });
         }
 
         const tempAlbumId = req.newAlbumId; // ID temporal para la carpeta
         if (!tempAlbumId) {
-            console.log(' no hau tempAlbumId')
+
             return res.status(401).json({ ok: false, msj: 'Error interno: ID de álbum temporal no generado.' });
         }
 
@@ -116,7 +170,7 @@ const createAlbum = async (req, res) => {
                 fs.rmSync(oldAlbumFolderPath, { recursive: true, force: true });
                 console.log(`Carpeta temporal '${oldAlbumFolderPath}' eliminada debido a validación fallida.`);
             }
-            console.log(' no hau titulo')
+
             return res.status(400).json({ message: 'El título del álbum es requerido.' });
         }
 
@@ -131,31 +185,39 @@ const createAlbum = async (req, res) => {
             console.warn('No se subió portada inicial para el álbum. Se usará una por defecto o se dejará en blanco.');
         }
         let albumId_DB = 0;
-
+        let albumsData = []
         if (titulo && descripcion && albumCoverFile) {
-            albumId_DB = AlbumModel.create(userId, titulo, descripcion, albumCoverPath)
+            albumId_DB = await AlbumModel.create(userId, undefined, titulo, descripcion, albumCoverPath)
             if (albumId_DB > 0) {
-                console.log(' Exito album')
+
+                const data = await AlbumModel.findById(albumId_DB)
+
+                if (Object.keys(data).length !== 0) {
+                    albumsData = [
+                        {//`idAlbum`, `usuarios_id`,  `titulo`, `descripcion`,  `portada`, `fecha_creacion`
+                            id: data.idAlbum,
+                            portadaUrl: data.portada,
+                            titulo: data.titulo,
+                            numObras: 0,
+                            descripcion: data.descripcion,
+                            ultimaActualizacion: data.fecha_update === null || data.fecha_update === undefined || data.fecha_update === 'null' ? '' : data.fecha_update
+
+                        }]
+                    console.log(albumsData)
+                }
                 return res.status(200).json({
                     ok: true,
                     msj: 'Álbum creado con éxito!',
-                    albumId: albumId_DB,
-                    title: title,
-                    description: description,
-                    coverImage: albumCoverPath
+                    albumsData: albumsData,
                 });
             }
 
         }
         if (albumId_DB <= 0 || !albumCoverFile) {
-            console.log("ERORRRRRRRRR estoy en el final")
+
             return res.status(401).json({
                 ok: false,
-                msj: 'No se pudo crear el registro para este album',
-                albumId: albumId_DB,
-                title: title,
-                description: description,
-                coverImage: albumCoverPath
+                msj: 'No se pudo crear el registro para este album'
             });
         }
 
@@ -176,8 +238,35 @@ const createAlbum = async (req, res) => {
     }
 };
 
+
+const loadAlbum = async (req, res) => {
+    const user = req.session.user;
+    const userId = user.id
+    let repuesta = {
+        ok: false,
+        mjs: 'No hay albums para el usuario',
+        albumsData: []
+    }
+    if (!user) {
+        return res.status(401).json(repuesta);
+    }
+
+    const albumsData = await AlbumModel.all(userId, undefined)
+
+    if (Object.keys(albumsData).length === 0) {
+        repuesta.ok = false
+        return res.status(401).json(repuesta);
+    }
+    repuesta.ok = true
+    repuesta.msj = 'El user tiene datos'
+    repuesta.albumsData = albumsData
+    return res.status(200).json(repuesta);
+}
 module.exports = {
     getpageAlbum,
     getPageAdministrarAlbum,
-    createAlbum
+    createAlbum,
+    loadAlbum,
+    getAlbumImages,
+    getAdministrarObras
 };

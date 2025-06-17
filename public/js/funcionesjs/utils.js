@@ -110,6 +110,30 @@ export function estaModalAbierto(modalId = 'registerModal') {
     return modalElement.classList.contains('show');
 }
 
+export function modalOpenClose(open = true, modalName) {
+    const modal = getElement(modalName)
+    const modalAcutalInstan = bootstrap.Modal.getInstance(modal);
+    if (modalAcutalInstan) {
+        console.log(`cerra modal ${!open}`)
+        !open ? modalAcutalInstan.hide() : modalAcutalInstan.show();
+    }
+}
+
+export function modalGenerico(open, name) {
+    const modal = getElement(name)
+    let albumViewerBsModal = bootstrap.Modal.getInstance(modal);
+
+    if (!albumViewerBsModal) {
+
+        albumViewerBsModal = new bootstrap.Modal(modal);
+    }
+    if (open) {
+        albumViewerBsModal.show()
+    } else {
+        albumViewerBsModal.hide()
+    }
+}
+
 
 export const NOTIFICACION_TYPE = Object.freeze({
 
@@ -242,4 +266,42 @@ export function VerificarCampos(data) {
     }
 
     return true;
+}
+
+/**
+ * Devulve un marca de tiempo amigable para los ultimos cambios para album
+ *
+ * @param {String} fechaString -formato fecha ingles
+ * @returns {String} - fecha strin amiagable como por ejemplo: 1 semana
+ */
+export function formatearTiempoDesde(fechaString) {
+    if (!fechaString) { return ''; }
+    const fecha = new Date(fechaString);
+    const ahora = new Date(); // Fecha y hora actuales
+
+    const diferenciaMs = ahora.getTime() - fecha.getTime();
+    const segundos = Math.floor(diferenciaMs / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const horas = Math.floor(minutos / 60);
+    const dias = Math.floor(horas / 24);
+    const semanas = Math.floor(dias / 7);
+    const meses = Math.floor(dias / 30);
+    const anios = Math.floor(dias / 365);
+
+    if (segundos < 60) {
+        return `hace ${segundos} segundo${segundos !== 1 ? 's' : ''}`;
+    } else if (minutos < 60) {
+        return `hace ${minutos} minuto${minutos !== 1 ? 's' : ''}`;
+    } else if (horas < 24) {
+        return `hace ${horas} hora${horas !== 1 ? 's' : ''}`;
+    } else if (dias < 7) {
+        return `hace ${dias} día${dias !== 1 ? 's' : ''}`;
+    } else if (semanas < 4) { // Menos de 4 semanas (aprox. 1 mes)
+        return `hace ${semanas} semana${semanas !== 1 ? 's' : ''}`;
+    } else if (meses < 12) {
+        return `hace ${meses} mes${meses !== 1 ? 'es' : ''}`;
+    } else {
+        return `hace ${anios} año${anios !== 1 ? 's' : ''}`;
+    }
+
 }

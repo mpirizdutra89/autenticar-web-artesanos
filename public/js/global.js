@@ -1,5 +1,9 @@
 // public/js/global.js
 
+/* const { getElement } = require("./funcionesjs/utils"); */
+import { getElement } from './funcionesjs/utils.js';
+
+
 // Lógica del modal del visor de álbumes (Carrusel) y sus comentarios
 const albumViewerModal = document.getElementById('albumViewerModal');
 const albumTitleElement = document.getElementById('albumViewerModalLabel');
@@ -19,7 +23,7 @@ const commentTextInput = document.getElementById('commentText');
 
 
 // Al abrir el modal del visor de álbumes
-albumViewerModal.addEventListener('show.bs.modal', event => {
+/* albumViewerModal.addEventListener('show.bs.modal', event => {
     const button = event.relatedTarget;
     const albumId = button.getAttribute('data-album-id');
 
@@ -45,17 +49,32 @@ albumViewerModal.addEventListener('show.bs.modal', event => {
 
     // Renderizar comentarios de la primera obra activa al abrir el modal
     const activeWorkItem = albumCarousel.querySelector('.carousel-item.active');
-    const currentWorkId = activeWorkItem ? activeWorkItem.getAttribute('data-work-id') : null;
-    if (currentWorkId) {
-        renderComments(currentWorkId);
+    /*   const currentWorkId = activeWorkItem ? activeWorkItem.getAttribute('data-work-id') : null;
+      if (currentWorkId) {
+          renderComments(currentWorkId);
+      }
+      commentTextInput.value = ''; 
+}); */
+
+
+
+
+
+function closeOpenModal(open) {
+
+    let albumViewerBsModal = bootstrap.Modal.getInstance(albumViewerModal);
+
+    if (!albumViewerBsModal) {
+
+        albumViewerBsModal = new bootstrap.Modal(albumViewerModal);
     }
-    commentTextInput.value = '';
-});
+    if (open) {
+        albumViewerBsModal.show()
+    } else {
+        albumViewerBsModal.hide()
+    }
 
-
-
-
-
+}
 
 
 // Lógica de pantalla completa para el modal del carrusel

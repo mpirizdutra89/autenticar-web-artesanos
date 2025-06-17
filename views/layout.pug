@@ -12,7 +12,7 @@ html(lang="es")
   body
     nav.navbar.navbar-expand-lg.sticky-top.navbar-custom
       .container-fluid
-        a.navbar-brand(href="/") Artesanos
+        a.navbar-brand(href="/album") Artesanos
         button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#loggedInNavbar", aria-controls="loggedInNavbar", aria-expanded="false", aria-label="Toggle navigation")
           span.navbar-toggler-icon.text-bg-light
         .collapse.navbar-collapse#loggedInNavbar.justify-content-between
@@ -73,7 +73,7 @@ html(lang="es")
     // Usamos 'block append scripts' para que las vistas que extienden este layout puedan añadir sus propios scripts AQUÍ.
     // Esto asegura que 'notificaciones.js' se cargue antes que cualquier script específico de una vista.
     script(src='/js/notificaciones.js' type="module") // Tu script de notificaciones
-    script(src="/js/global.js")         // Tu script global
+    script(src="/js/global.js" type="module")         // Tu script global
 
     // Este 'block scripts' se puede usar en tus vistas que extienden el layout
     // para añadir scripts específicos de esa vista, y se cargarán DESPUÉS

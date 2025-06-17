@@ -1,18 +1,146 @@
 extends layout
+block  styles
+    style.
+        .image-container {
+            position: relative; /* Esencial para que el botón flotante se posicione con respecto a él */
+            border-radius: 8px; /* Bordes redondeados para la tarjeta de imagen */
+            overflow: hidden; /* Asegura que la imagen y el botón no sobresalgan del radio */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra sutil para la tarjeta */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            margin-bottom: 1rem; /* Espacio entre las tarjetas en dispositivos pequeños */
+            display: flex; /* Para flexbox layout */
+            flex-direction: column; /* Organiza los elementos en columna */
+        }
+        .image-container:hover {
+            transform: translateY(-5px); /* Pequeño efecto de elevación al pasar el ratón */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .image-container img {
+            width: 100%;
+            height: 250px; /* Altura fija para todas las imágenes */
+            object-fit: cover; /* Recorta la imagen para que cubra el área sin distorsionarse */
+            display: block; /* Elimina espacio extra debajo de la imagen */
+        }
+        .delete-button {
+            position: absolute; /* Permite que el botón flote */
+            top: 10px; /* Distancia desde la parte superior */
+            right: 10px; /* Distancia desde la parte derecha */
+            z-index: 10; /* Asegura que el botón esté por encima de la imagen */
+            border-radius: 50%; /* Botón redondo */
+            width: 40px; /* Tamaño fijo del botón */
+            height: 40px; /* Tamaño fijo del botón */
+            display: flex; /* Para centrar el ícono */
+            justify-content: center; /* Centra horizontalmente el ícono */
+            align-items: center; /* Centra verticalmente el ícono */
+            padding: 0; /* Elimina padding por defecto para control de tamaño */
+            font-size: 1.2rem; /* Tamaño del ícono */
+            opacity: 0.8; /* Ligeramente transparente */
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .delete-button:hover {
+            opacity: 1; /* Opacidad completa al pasar el ratón */
+            transform: scale(1.1); /* Ligero aumento de tamaño al pasar el ratón */
+        }
+
+        /* Estilos para el pie de foto que aparece al pasar el mouse */
+        .image-caption {
+            background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro semi-transparente */
+            color: #fff; /* Texto blanco */
+            padding: 10px 15px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0; /* Oculto por defecto */
+            transform: translateY(100%); /* Desplazado hacia abajo por defecto */
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Transición suave */
+            pointer-events: none; /* Asegura que no interfiera con otros clics */
+            box-sizing: border-box; /* Incluye padding en el ancho */
+        }
+
+        .image-container:hover .image-caption {
+            opacity: 1; /* Muestra al pasar el mouse */
+            transform: translateY(0); /* Vuelve a su posición normal */
+        }
+
+        .image-caption h5 {
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .image-caption p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Espacio entre las previsualizaciones */
+            margin-top: 20px;
+            border: 1px dashed #ccc;
+            padding: 15px;
+            min-height: 100px;
+            justify-content: center;
+            align-items: center;
+            color: #888;
+        }
+        .image-preview-item {
+            position: relative;
+            width: 150px; /* Tamaño de la previsualización */
+            height: 150px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Para que la imagen cubra el área sin distorsionar */
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: bold;
+            line-height: 1; /* Para centrar la 'x' */
+            padding: 0;
+        }
+    
 block content
-      .tab-pane.fade.show.active#albums(role="tabpanel", aria-labelledby="albums-tab")
+      .tab-content
         .d-flex.justify-content-between.align-items-center.mb-4
-          h3.mb-0.text-section-title 
-          button.btn.btn-primary(type="button", data-bs-toggle="modal", data-bs-target="#addObras")
+          nav(aria-label="breadcrumb")
+              ol.breadcrumb
+                li.breadcrumb-item(href="#")
+                  a(href="../")
+                    | Album
+                li.breadcrumb-item
+                  | Administrar obras
+          button.btn.btn-primary#btnAddObras(type="button")
             ibi.bi-plus-circle-fill.me-2
             | Añadir obras
-        .row.row-cols-md-12
-        
+        .row.row-cols-1.row-cols-sm-2.row-cols-md-3.row-cols-lg-4.g-4#imgContainer
 
-      include ./partials/create_album_modal.pug
+      
       include ./partials/manage_album_works_modal.pug
 
-
+     
 block scripts
-    script(src="/js/albums.js")
-    //block scripts deve estar afuera del block content
+    script.
+      window.albumsData = !{JSON.stringify(albumsData || [])};    
+    script(src="/js/adminAlbum.js" type="module")
