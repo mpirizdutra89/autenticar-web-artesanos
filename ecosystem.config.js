@@ -1,6 +1,6 @@
 module.exports = {
     apps: [{
-        name: "artesanos-app",
+        name: "artesanos",
         script: "./app.js", // O el nombre de tu archivo principal
         instances: "max",
         exec_mode: "cluster",
