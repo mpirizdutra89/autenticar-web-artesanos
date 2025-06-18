@@ -2,17 +2,20 @@
 
 require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
 
-
+let DB_HOST = process.env.DB_HOST ? process.env.DB_HOST : 'localhost'
+let DB_USER = process.env.DB_USER ? process.env.DB_USER : 'root'
+let DB_NAME = process.env.DB_NAME ? process.env.DB_NAME : 'mpd_artesanos'
+let DB_PASSWORD = process.env.DB_PASSWORD ? process.env.DB_PASSWORD : 'reSUlu43ra'
 // Importa el pool de conexiones que definiste en db.js
 const pool = require('../db');
 
 async function testDatabaseConnection() {
     console.log('--- Verificando variables de entorno de la base de datos ---');
-    console.log(`DB_HOST: ${process.env.DB_HOST}`);
-    console.log(`DB_USER: ${process.env.DB_USER}`);
-    console.log(`DB_NAME: ${process.env.DB_NAME}`);
+    console.log(`DB_HOST: ${DB_HOST}`);
+    console.log(`DB_USER: ${DB_USER}`);
+    console.log(`DB_NAME: ${DB_NAME}`);
     // No imprimimos DB_PASSWORD directamente por seguridad, solo verificamos si existe
-    console.log(`DB_PASSWORD ${process.env.DB_PASSWORD ? 'está configurada' : 'NO está configurada'}`);
+    console.log(`DB_PASSWORD ${DB_PASSWORD ? 'está configurada' : 'NO está configurada'}`);
     console.log('----------------------------------------------------');
     console.log('');
 
