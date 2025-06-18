@@ -56,12 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         //panel
     });
-
-    if (isObjectEmpty(initialNotifications)) {
-        notificacionUnread.innerHTML = `
+    if (notificacionUnread) {
+        if (isObjectEmpty(initialNotifications)) {
+            notificacionUnread.innerHTML = `
                      <p class="text-center text-muted mt-4">
                         <i class="bi bi-check-circle-fill me-2"></i> ¡No tienes notificaciones sin leer!
                     </p> `
+        }
     }
 
     if (notificationList) {
