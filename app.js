@@ -138,7 +138,7 @@ app.set('views', path.join(__dirname, 'views'));
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24,
                 httpOnly: true,
-                secure: false
+                secure: true //para sitios https si no false
             }
         })(socket.request, {}, next);
     });
