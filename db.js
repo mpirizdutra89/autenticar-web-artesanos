@@ -4,9 +4,9 @@ const mysql = require('mysql2/promise'); // Importa el módulo mysql2 con soport
 
 require('dotenv').config();
 let DB_HOST = 'localhost'
-let DB_USER = 'artesano'; //process.env.DB_USER ? process.env.DB_USER :
+let DB_USER = 'root'; //process.env.DB_USER ? process.env.DB_USER :
 let DB_NAME = 'mpd_artesanos'
-let DB_PASSWORD = 'artesano20';//process.env.DB_PASSWORD ? process.env.DB_PASSWORD :
+let DB_PASSWORD = 'nicolas89';//process.env.DB_PASSWORD ? process.env.DB_PASSWORD :
 
 // Crea un pool de conexiones a la base de datos
 // Un pool es más eficiente que abrir y cerrar una conexión para cada consulta.
