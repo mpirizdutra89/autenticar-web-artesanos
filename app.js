@@ -30,6 +30,8 @@ const loadNotificationsMiddleware = require('./middleware/notificationMiddleware
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003
 const HOST = process.env.HOST ? process.env.HOST : "localhost"
+const SESSION_SECRET = process.env.SESSION_SECRET ? process.env.SESSION_SECRET : "nicolas89"
+const REDIS_URL = process.env.REDIS_URL ? process.env.REDIS_URL : "redis://localhost:6379"
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
@@ -45,7 +47,7 @@ app.set('views', path.join(__dirname, 'views'));
 (async () => {
     // 1. Configuración y Conexión a Redis para SESSIONS
     let redisClient = createClient({
-        url: process.env.REDIS_URL || "redis://localhost:6379"
+        url: REDIS_URL
     });
     redisClient.on('connect', () => console.log('✅ Conectado a Redis para Sesiones!'));
     redisClient.on('error', (err) => console.error('❌ Error de conexión a Redis para Sesiones:', err));
@@ -59,7 +61,7 @@ app.set('views', path.join(__dirname, 'views'));
 
     app.use(session({
         store: new RedisStore({ client: redisClient }),
-        secret: process.env.SESSION_SECRET || "nicolas89",
+        secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -71,8 +73,8 @@ app.set('views', path.join(__dirname, 'views'));
 
 
     // Clientes de Redis para el adaptador de Socket.IO (necesita dos clientes: pub y sub)
-    const pubClient = createClient({ url: process.env.REDIS_URL || "redis://localhost:6379" });
-    const subClient = createClient({ url: process.env.REDIS_URL || "redis://localhost:6379" });
+    const pubClient = createClient({ url: REDIS_URL });
+    const subClient = createClient({ url: REDIS_URL });
 
     pubClient.on('connect', () => console.log('✅ Conectado a Redis (PubClient) para Socket.IO!'));
     subClient.on('connect', () => console.log('✅ Conectado a Redis (SubClient) para Socket.IO!'));
@@ -130,7 +132,7 @@ app.set('views', path.join(__dirname, 'views'));
         // Convierte el middleware de express-session en un middleware de Socket.IO
         session({
             store: new RedisStore({ client: redisClient }), // Reusa la misma configuración de store
-            secret: process.env.SESSION_SECRET || "nicolas89",
+            secret: SESSION_SECRET,
             resave: false,
             saveUninitialized: false,
             cookie: {
