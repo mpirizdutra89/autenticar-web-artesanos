@@ -170,7 +170,7 @@ const authController = {
                     respuesta.msj = `Sesion exitosa, bienvenido ${req.session.user.email}`
                     respuesta.ok = true
 
-                    respuesta.url = req.session.user.verified == 1 ? '/dashboard' : 'usuario/crear-verificacion' // aca si no esta verificado , redireccionar a una view para la verificaion
+                    respuesta.url = req.session.user.verified == 1 ? '/album' : 'usuario/crear-verificacion' // aca si no esta verificado , redireccionar a una view para la verificaion
                     console.log(respuesta.url)
                     res.status(200).json(respuesta);
                     //res.redirect('/dashboard'); // Redirige al dashboard

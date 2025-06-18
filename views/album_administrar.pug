@@ -142,5 +142,7 @@ block content
      
 block scripts
     script.
-      window.albumsData = !{JSON.stringify(albumsData || [])};    
+      window.albumsData = !{JSON.stringify(albumsData || [])};
+      window.album =!{JSON.stringify(album || [])};
+        
     script(src="/js/adminAlbum.js" type="module")

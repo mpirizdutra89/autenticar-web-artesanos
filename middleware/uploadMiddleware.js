@@ -25,6 +25,7 @@ function getSecureUserId(req) {
  * @throws {Error} Si un ID requerido (ej. albumId) no está presente.
  */
 function getFileDestination(req, file) {
+    //console.log(`GerFileDestination() ${req}`)
     const userId = getSecureUserId(req);
     req.userUploadsId = userId; // Adjuntamos el userId seguro para el controlador
 
@@ -36,7 +37,8 @@ function getFileDestination(req, file) {
     let subPath;
     // Priorizamos req.newAlbumId (para la creación de álbum) sobre req.params.id
     // Si req.newAlbumId existe, significa que estamos en el flujo de creación de un nuevo álbum.
-    const albumIdToUse = req.newAlbumId || req.params.id;
+    const albumIdToUse = req.newAlbumId || req.params.id || req.body.newAlbumId;
+    // console.log("new Album", albumIdToUse)
 
     if (file.fieldname === 'profile_image') {
         subPath = 'perfil';
@@ -54,7 +56,7 @@ function getFileDestination(req, file) {
         if (!albumIdToUse) {
             throw new Error('Album ID es requerido para subir fotos a un álbum.');
         }
-        subPath = path.join('albums', `album_${albumIdToUse}`, 'obras'); // <-- ¡NUEVA SUBCARPETA!
+        subPath = path.join('albums', `${albumIdToUse}`, 'obras'); // <-- ¡NUEVA SUBCARPETA! ya teine el album_
     } else {
         subPath = ''; // Por defecto, si no coincide ningún campo específico
     }
@@ -74,7 +76,8 @@ function getFileDestination(req, file) {
 function getFileName(req, file) {
     const ext = path.extname(file.originalname);
     let filename;
-
+    // console.log("getFileName")
+    //console.log(`${file.fieldname} --- extencion.${ext}`)
     if (file.fieldname === 'profile_image') {
         filename = 'profile' + ext;
     } else if (file.fieldname === 'cover_image' || file.fieldname === 'album_initial_cover') {
@@ -136,4 +139,23 @@ exports.createAlbumUpload = uploadImages.fields([
     // Otros campos de texto como 'title', 'description' estarán en req.body
 ]);
 
-exports.multerErrorHandler = (err, req, res, next) => { /* ... sin cambios ... */ };
+exports.multerErrorHandler = (err, req, res, next) => {
+    // Primero, verifica si el error es una instancia de MulterError
+
+    console.log(`req: ${req}`)
+    console.error('Multer: ', err.message);
+    try {
+        return res.status(403).json({
+            message: `Multer:  ${err.message}`
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: `Multer: ${error}`
+        })
+    }
+
+
+    // Si no hay error, pasa al siguiente middleware en la cadena
+    next();
+};

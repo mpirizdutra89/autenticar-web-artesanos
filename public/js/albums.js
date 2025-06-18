@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 //console.log(data.portada)
                 const album = {
                     id: data.idAlbum,
-                    portadaUrl: data.portada,
+                    portadaUrl: `${data.directorio}portada/cover.jpeg`,
                     titulo: data.titulo,
                     numObras: data.cantidad_imagenes,
                     ultimaActualizacion: data.fecha_update,

@@ -23,6 +23,7 @@ const albumController = require('../controllers/albumController');
 const upload = require('../middleware/uploadMiddleware');
 const validateIdParam = require('../middleware/validateIdParam');
 const generateAlbumId = require('../middleware/generateAlbumId');
+//const albumActual = require('../middleware/idAlbumMiddleware')
 const router = express.Router();
 
 // -------------------------------------------------------------
@@ -39,8 +40,11 @@ const router = express.Router();
 //router.delete('/:id', albumController.deleteAlbum);
 router.post('/load-album', albumController.loadAlbum)
 router.post('/create-album', generateAlbumId, upload.createAlbumUpload, albumController.createAlbum);
+router.post('/upload-obras', upload.albumPhotosUpload, albumController.uploadObras)
+
 router.get('/imagenes/:id', validateIdParam, albumController.getAlbumImages);
 
+router.get('/album-administrar/delete/:id', validateIdParam, albumController.getDeletObra)
 router.get('/album-administrar/:id', validateIdParam, albumController.getAdministrarObras)
 router.get('/', albumController.getpageAlbum);
 module.exports = router;

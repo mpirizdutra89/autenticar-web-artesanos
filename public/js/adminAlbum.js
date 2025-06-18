@@ -1,4 +1,4 @@
-import { getQueryElement, VerificarCampos, formatearTiempoDesde, formatStringWithUnderscores, modalOpenClose, estaModalAbierto, modalGenerico, isObjectEmpty, showFloatingAlert } from './funcionesjs/utils.js';
+import { getQueryElement, modalGenerico, albumIdRuta, isObjectEmpty, showFloatingAlert } from './funcionesjs/utils.js';
 
 
 
@@ -12,20 +12,22 @@ import { getQueryElement, VerificarCampos, formatearTiempoDesde, formatStringWit
  * @property {HTMLElement | NULL} imagePreviewContainer
  * @property {HTMLElement | NULL} noImagesText
  * @property {HTMLElement | NULL} uploadButton
+ * @property {HTMLElement | null} confirmDeleteBtn
  * @property {HTMLBodyElement} body
  */
 
 /** @type {CachedDOMElements} */
 const elements = {};
+
 const cache = () => {
     elements.imgContainer = getQueryElement("#imgContainer")
     elements.btnAddObras = getQueryElement("#btnAddObras")
     elements.manageAlbumWorksModal = getQueryElement("#manageAlbumWorksModal")
-    elements.imageUploadInput = getQueryElement("#imageUpload")
+    elements.imageUploadInput = getQueryElement("#album_photos")
     elements.imagePreviewContainer = getQueryElement("#imagePreviewContainer")
     elements.noImagesText = getQueryElement("#noImagesText")
     elements.uploadButton = getQueryElement("#uploadButton")
-
+    elements.confirmDeleteBtn = getQueryElement("#confirmDeleteBtn")
 
     elements.body = document.body;
 
@@ -36,9 +38,22 @@ const cache = () => {
     return true;
 }
 
-
+var IDALBUM = 0
+var DIRECTORIO_ALBUM = ''
+var RAIZ = '/uploads/'
+var IDobraDelete = 0
 document.addEventListener('DOMContentLoaded', () => {
     const obrasList = window.albumsData || [];
+    const objetAlbum = window.album[0];
+
+    if (objetAlbum) {
+        DIRECTORIO_ALBUM = objetAlbum.directorio
+        IDALBUM = objetAlbum.idAlbum;
+    }
+    console.log(DIRECTORIO_ALBUM)
+
+
+
     if (cache()) {
         loadImg(obrasList)
         elements.btnAddObras.addEventListener('click', function () {
@@ -111,6 +126,30 @@ function subirImg() {
         // elements.imageUploadInput.disabled = selectedFilesMap.size >= MAX_IMAGES_COUNT;
     };
 
+
+    //borra 
+    elements.imgContainer.addEventListener('click', (event) => {
+        const button = event.target
+        const deleteButtonElement = button.closest('.delete-button');
+        if (deleteButtonElement) {
+            IDobraDelete = deleteButtonElement.dataset.obraid || deleteButtonElement.dataset.obraId
+            modalGenerico(true, 'mdSioNo')
+        }
+    })
+
+    elements.confirmDeleteBtn.addEventListener('click', async (event) => {
+        //console.log(IDobraDelete)
+        modalGenerico(false, 'mdSioNo')
+        try {
+            const response = await fetch(`/album/album-administrar/delete/${albumId}`);
+        }
+        catch (error) {
+
+        }
+
+    })
+
+
     // --- Listener para el cambio en el input de archivo ---
     elements.imageUploadInput.addEventListener('change', (event) => {
         const files = event.target.files;
@@ -177,23 +216,39 @@ function subirImg() {
             return;
         }
 
+        if (!IDALBUM > 0) {
+            const msj = 'Referencia de album invalida'
+            showFloatingAlert(msj, 'danger', 'bottom', 3000)
+            return;
+        }
+
         const formData = new FormData();
+
+        formData.append('albumId', IDALBUM);
+        formData.append('newAlbumId', albumIdRuta(DIRECTORIO_ALBUM))
+
         selectedFilesMap.forEach((file, fileId) => {
-            formData.append('images[]', file, file.name);
+            //formData.append('images[]', file, file.name);
+            formData.append('album_photos', file, file.name);
         });
+        /*  for (const file of fileInput.files) {
+                formData.append('album_photos', file);
+            } */
 
         elements.uploadButton.disabled = true;
         elements.uploadButton.textContent = 'Subiendo...';
 
         try {
-            const response = await fetch('/api/upload-images', { // Ajusta tu URL aquí
+            const response = await fetch('/album/upload-obras', { // Ajusta tu URL aquí
                 method: 'POST',
                 body: formData,
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || `Error al subir imágenes: ${response.status}`);
+                console.log(errorData.message || `Error al subir imágenes: ${response.status}`);
+                let msj = 'Ocurrio una falla al intenrae subir las imagenes'
+                showFloatingAlert(msj, 'danger', 'bottom', 3000)
             }
 
             const result = await response.json();
@@ -207,8 +262,8 @@ function subirImg() {
             updateUploadButtonState();
 
         } catch (error) {
-            console.error('Error al subir imágenes:', error);
-            const msj = `Hubo un error al subir las imágenes: ${error.message}`;
+            console.error('Error al subir imágenes:');
+            const msj = `Hubo un error al subir las imágenes`;
             showFloatingAlert(msj, 'success', 'bottom', 3000)
         } finally {
             elements.uploadButton.disabled = false;
@@ -227,7 +282,7 @@ const loadImg = (obras) => {
     obras.forEach(obra => {
         const img = {
             id: obra.idimage,
-            portadaUrl: obra.url,
+            portadaUrl: `${RAIZ}${obra.url}`,
             detalle: obra.detalle || 'Detalle de la obra'
         }
         const nueva = crearImg(img)
@@ -256,7 +311,7 @@ const crearImg = (obra) => {
         <div class="col">
                 <div class="image-container">
                     <img src="${obra.portadaUrl}" class="img-fluid" alt="${obra.detalle}">
-                    <button class="btn btn-danger btn-sm delete-button" title="Eliminar"  data-id="${obra.id}">
+                    <button class="btn btn-danger btn-sm delete-button" title="Eliminar"  data-obra-id="${obra.id}">
                         <i class="bi bi-trash"></i>
                     </button>
                     <div class="image-caption">                        

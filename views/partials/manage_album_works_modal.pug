@@ -13,8 +13,8 @@
                     .tab-pane.fade.show.active#pills-add-works(role="tabpanel", aria-labelledby="pills-add-works-tab")
                         
                             .mb-3
-                                label.form-label(for="imageUpload") Subir Imágenes 
-                                input.form-control#imageUpload(type="file", multiple, accept="image/jpeg,image/jpg, image/png")
+                                label.form-label(for="album_photos") Subir Imágenes 
+                                input.form-control(type="file", multiple, id="album_photos", name="album_photos", accept="image/jpeg,image/jpg, image/png")
                                 small.form-text.text-muted Puedes seleccionar múltiples archivos a la vez.
                             .mb-3 
                                 .image-preview-container#imagePreviewContainer
@@ -27,3 +27,16 @@
                 button.btn.btn-primary.btn-lg#uploadButton(type="button",disabled) 
                     <i class="bi bi-file-earmark-arrow-up me-2"></i>
                     | Subir Imagenes
+
+
+#mdSioNo.modal.fade(tabindex="-1", aria-labelledby="confirmDeleteModalLabel", aria-hidden="true")
+      .modal-dialog
+        .modal-content
+          .modal-header
+            h5#confirmDeleteModalLabel.modal-title Confirmar Eliminación
+            button.btn-close(type="button", data-bs-dismiss="modal", aria-label="Cerrar")
+          .modal-body             
+            p ¿Está seguro de que desea borrar esta obra? Esta acción no se puede deshacer.              
+          .modal-footer
+            button.btn.btn-secondary(type="button", data-bs-dismiss="modal") No
+            button#confirmDeleteBtn.btn.btn-danger(type="button") Sí, Borrar

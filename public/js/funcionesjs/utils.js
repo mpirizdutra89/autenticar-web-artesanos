@@ -134,6 +134,12 @@ export function modalGenerico(open, name) {
     }
 }
 
+export function albumIdRuta(ruta) {
+    const partes = ruta.split('/');
+    return partes[partes.length - 2];
+
+}
+
 
 export const NOTIFICACION_TYPE = Object.freeze({
 
