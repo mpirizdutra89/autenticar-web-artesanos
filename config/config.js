@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
+}
 const config = {
     jwtSecret: process.env.JWTSECRET,
     email: {

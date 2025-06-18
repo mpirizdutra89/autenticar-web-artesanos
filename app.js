@@ -2,7 +2,9 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
+}
 
 // --- Importaciones de Redis para express-session (ya las tienes) ---
 const { RedisStore } = require('connect-redis');
@@ -33,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
 app.use('/bootstrap-icons', express.static(path.join(__dirname, 'node_modules/bootstrap-icons/font')))// Esto expone la carpeta 'node_modules/bootstrap-icons/font' bajo la ruta '/bootstrap-icons'
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.set('view engine', 'pug');

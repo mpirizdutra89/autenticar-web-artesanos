@@ -1,7 +1,9 @@
 // db.js
 // Este archivo maneja la conexión a la base de datos MySQL.
 const mysql = require('mysql2/promise'); // Importa el módulo mysql2 con soporte para promesas
-require('dotenv').config(); // Carga las variables de entorno
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
+}
 
 // Crea un pool de conexiones a la base de datos
 // Un pool es más eficiente que abrir y cerrar una conexión para cada consulta.

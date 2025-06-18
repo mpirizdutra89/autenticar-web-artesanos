@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
+}
 //console.log(process.env)
 // --- Configuración de Email (AJUSTA ESTO CON TUS DATOS REALES) ---
 // Es crucial que esta configuración coincida con la que usas en config/config.js
