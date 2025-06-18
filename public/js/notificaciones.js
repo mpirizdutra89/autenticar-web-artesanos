@@ -16,7 +16,7 @@ const btnTabRead = document.getElementById("read-tab")
 // 'io()' debe estar disponible globalmente gracias al <script src="/socket.io/socket.io.js">
 const socket = null
 if (notificacionUnread || notificationList) {
-    socket = io('https://artesanos.mpiridutra.site');
+    socket = io('');
 }
 
 let unreadCount = 0;
