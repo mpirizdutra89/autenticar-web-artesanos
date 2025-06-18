@@ -1,5 +1,5 @@
 
-
+const socket = io();
 
 import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isObjectEmpty } from './funcionesjs/utils.js';
 //#notificacion-container   #nrNotificacion
@@ -14,10 +14,8 @@ const notificacionUnread = document.getElementById("unread")
 const notificacionRead = document.getElementById("read")
 const btnTabRead = document.getElementById("read-tab")
 // 'io()' debe estar disponible globalmente gracias al <script src="/socket.io/socket.io.js">
-const socket = null
-if (notificacionUnread || notificationList) {
-    socket = io('');
-}
+
+
 
 let unreadCount = 0;
 
