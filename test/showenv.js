@@ -1,8 +1,8 @@
-// showEnvVars.js
-require('dotenv').config(); // Carga las variables de entorno desde el archivo .env
-
+// Carga las variables de entorno desde el archivo .env
+console.log("----------------------------")
 console.log('--- Variables de Entorno del Proyecto ---');
 
+console.log("Estoy en:", process.env.NODE_ENV)
 // Variables del servidor
 console.log(`PORT: ${process.env.PORT || 'No definida'}`);
 console.log(`HOST: ${process.env.HOST || 'No definida'}`);
