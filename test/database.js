@@ -15,7 +15,7 @@ async function testDatabaseConnection() {
     console.log(`DB_USER: ${DB_USER}`);
     console.log(`DB_NAME: ${DB_NAME}`);
     // No imprimimos DB_PASSWORD directamente por seguridad, solo verificamos si existe
-    console.log(`DB_PASSWORD ${DB_PASSWORD ? 'está configurada' : 'NO está configurada'}`);
+    console.log(`DB_PASSWORD ${DB_PASSWORD}`);
     console.log('----------------------------------------------------');
     console.log('');
 
