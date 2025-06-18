@@ -3,9 +3,9 @@
 const mysql = require('mysql2/promise'); // Importa el módulo mysql2 con soporte para promesas
 
 require('dotenv').config();
-let DB_HOST = process.env.DB_HOST ? process.env.DB_HOST : 'localhost'
+let DB_HOST = 'localhost'
 let DB_USER = 'artesano'; //process.env.DB_USER ? process.env.DB_USER :
-let DB_NAME = process.env.DB_NAME ? process.env.DB_NAME : 'mpd_artesanos'
+let DB_NAME = 'mpd_artesanos'
 let DB_PASSWORD = 'artesano20';//process.env.DB_PASSWORD ? process.env.DB_PASSWORD :
 
 // Crea un pool de conexiones a la base de datos
