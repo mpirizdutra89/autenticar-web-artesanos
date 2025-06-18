@@ -320,33 +320,33 @@ function tipoIcono(tipo) {
     return icon;
 }
 
-if (notificacionUnread || notificationList) {
-    socket.on('nueva_notificacion', (notificacion) => {
-        console.log('Nueva notificación recibida:', notificacion);
-        /*   const notificationItem = document.createElement('div');
-          notificationItem.id = `notif-${notificacion.id}`;
-          notificationItem.className = 'list-group-item notification-item list-group-item-warning';
-          notificationItem.innerHTML = `
-            <div class="d-flex w-100 justify-content-between">
-              <h6 class="mb-1">${notificacion.mensaje}</h6>
-              <button class="btn btn-sm btn-outline-secondary mark-as-read-btn" data-id="${notificacion.id}">Marcar como leída</button>
-            </div>
-            <small class="text-muted">${new Date(notificacion.fecha_creacion).toLocaleString()}</small>
-          `; */
-        if (notificationList) {
-            // notificationList.prepend(notificationItem);
-            notificationList.prepend(crearItemPersonalisado(notificacion));
-        }
-        updateUnreadCount(1);
-        if (noNotificationsMessage) noNotificationsMessage.style.display = 'none';
-    });
-}
-//socket.on('notificaciones_iniciales', (notificaciones) => {
-// Este listener es útil si, por ejemplo, el servidor reenvía todas las notificaciones
-// en una reconexión. Podrías querer vaciar y recrear la lista aquí.
-//console.log('Notificaciones iniciales recibidas por Socket.IO (reconexión/carga):', notificaciones);
-// Lógica para reemplazar/actualizar la lista completa de notificaciones si es necesario
-//}); 
+//if (notificacionUnread || notificationList) {
+socket.on('nueva_notificacion', (notificacion) => {
+    console.log('Nueva notificación recibida:', notificacion);
+    /*   const notificationItem = document.createElement('div');
+      notificationItem.id = `notif-${notificacion.id}`;
+      notificationItem.className = 'list-group-item notification-item list-group-item-warning';
+      notificationItem.innerHTML = `
+        <div class="d-flex w-100 justify-content-between">
+          <h6 class="mb-1">${notificacion.mensaje}</h6>
+          <button class="btn btn-sm btn-outline-secondary mark-as-read-btn" data-id="${notificacion.id}">Marcar como leída</button>
+        </div>
+        <small class="text-muted">${new Date(notificacion.fecha_creacion).toLocaleString()}</small>
+      `; */
+    if (notificationList) {
+        // notificationList.prepend(notificationItem);
+        notificationList.prepend(crearItemPersonalisado(notificacion));
+    }
+    updateUnreadCount(1);
+    if (noNotificationsMessage) noNotificationsMessage.style.display = 'none';
+});
+//}
+socket.on('notificaciones_iniciales', (notificaciones) => {
+    // Este listener es útil si, por ejemplo, el servidor reenvía todas las notificaciones
+    // en una reconexión. Podrías querer vaciar y recrear la lista aquí.
+    console.log('Notificaciones iniciales recibidas por Socket.IO (reconexión/carga):', notificaciones);
+    // Lógica para reemplazar/actualizar la lista completa de notificaciones si es necesario
+});
 
 if (notificacionUnread) {
     btnTabRead.addEventListener('click', async (event) => {
