@@ -1,5 +1,5 @@
 // 'io()' debe estar disponible globalmente gracias al <script src="/socket.io/socket.io.js">
-const socket = io();
+const socket = io('https://artesanos.mpiridutra.site');
 
 
 import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isObjectEmpty } from './funcionesjs/utils.js';
@@ -340,12 +340,12 @@ socket.on('nueva_notificacion', (notificacion) => {
     if (noNotificationsMessage) noNotificationsMessage.style.display = 'none';
 });
 
-socket.on('notificaciones_iniciales', (notificaciones) => {
+/* socket.on('notificaciones_iniciales', (notificaciones) => {
     // Este listener es útil si, por ejemplo, el servidor reenvía todas las notificaciones
     // en una reconexión. Podrías querer vaciar y recrear la lista aquí.
     console.log('Notificaciones iniciales recibidas por Socket.IO (reconexión/carga):', notificaciones);
     // Lógica para reemplazar/actualizar la lista completa de notificaciones si es necesario
-});
+}); */
 
 if (notificacionUnread) {
     btnTabRead.addEventListener('click', async (event) => {
