@@ -7,8 +7,8 @@ let DB_USER = process.env.DB_USER ? process.env.DB_USER : 'root'
 let DB_NAME = process.env.DB_NAME ? process.env.DB_NAME : 'mpd_artesanos'
 let DB_PASSWORD = process.env.DB_PASSWORD ? process.env.DB_PASSWORD : 'reSUlu43ra'
 // Importa el pool de conexiones que definiste en db.js
-const pool = require('../db');
-
+//const pool = require('../db');
+const UserModelo = require('../models/UserModel')
 async function testDatabaseConnection() {
     console.log('--- Verificando variables de entorno de la base de datos ---');
     console.log(`DB_HOST: ${DB_HOST}`);
@@ -22,16 +22,16 @@ async function testDatabaseConnection() {
     try {
         console.log('Intentando obtener una conexión del pool...');
         // Intenta obtener una conexión del pool
-        const connection = await pool.getConnection();
+        //const connection = await pool.getConnection();
         console.log('¡Conexión obtenida del pool correctamente!');
 
         console.log('Ejecutando una consulta de prueba (SELECT 1 + 1)...');
         // Ejecuta una consulta simple para verificar que la conexión funciona
-        const [rows] = await connection.execute('SELECT 1 + 1 AS solution');
-        console.log('Resultado de la consulta de prueba:', rows[0].solution);
+        const [rows] = await UserModelo.findById(1)
+        console.log(rows);
 
         // Libera la conexión de vuelta al pool
-        connection.release();
+        //connection.release();
         console.log('Conexión liberada de vuelta al pool.');
         console.log('');
         console.log('--- ¡ÉXITO! La conexión a la base de datos funciona correctamente. ---');
@@ -47,10 +47,10 @@ async function testDatabaseConnection() {
     } finally {
         // Cierra el pool después de la prueba para asegurar que el script termine
         // Esto es importante para scripts de prueba únicos, no para aplicaciones que siempre están corriendo
-        if (pool) {
-            await pool.end();
-            console.log('Pool de conexiones cerrado.');
-        }
+        /*  if (pool) {
+             await pool.end();
+             console.log('Pool de conexiones cerrado.');
+         } */
     }
 }
 
