@@ -1,7 +1,7 @@
 // test.js
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
-}
+
+require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
+
 
 // Importa el pool de conexiones que definiste en db.js
 const pool = require('../db');

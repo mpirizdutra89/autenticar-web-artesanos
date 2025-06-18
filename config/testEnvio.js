@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
-}
+
+require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
+
 //console.log(process.env)
 // --- Configuración de Email (AJUSTA ESTO CON TUS DATOS REALES) ---
 // Es crucial que esta configuración coincida con la que usas en config/config.js
@@ -11,8 +11,8 @@ const emailConfig = {
     port: 587,
     secure: false, // true para puerto 465, false para otros como 587
     auth: {
-        user: process.env.EMAIL, // <-- ¡CAMBIA ESTO! Tu dirección de correo
-        pass: process.env.PASSEMAIL//'edarauhwijpipdrq' // <-- ¡CAMBIA ESTO! Tu contraseña de aplicación (sin espacios) o tu contraseña normal
+        user: "artesanos.mpd@gmail.com", // <-- ¡CAMBIA ESTO! Tu dirección de correo
+        pass: "edarauhwijpipdrq"//'edarauhwijpipdrq' // <-- ¡CAMBIA ESTO! Tu contraseña de aplicación (sin espacios) o tu contraseña normal
     },
     // Opcional: Para entornos de desarrollo donde el certificado SSL puede dar problemas
     // tls: {
