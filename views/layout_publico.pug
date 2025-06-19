@@ -88,12 +88,11 @@ html(lang="es")
     // TUS SCRIPTS PERSONALIZADOS (que dependen de las librerías anteriores y de initialNotificationsData)
     // Usamos 'block append scripts' para que las vistas que extienden este layout puedan añadir sus propios scripts AQUÍ.
     // Esto asegura que 'notificaciones.js' se cargue antes que cualquier script específico de una vista.
-    script(src='/js/notificaciones.js' type="module") // Tu script de notificaciones
-    script(src="/js/buscar.js")//al estar en el loyut public de alguna maenara hay qeu decirselo al script capas una etiqueta ocula en el html  
-    script(src="/js/global.js" type="module")         // Tu script global
+    script(src='/js/notificaciones.js' type="module")
+    script(src="/js/buscar.js")
+    script(src="/js/global.js" type="module")
 
     // Este 'block scripts' se puede usar en tus vistas que extienden el layout
     // para añadir scripts específicos de esa vista, y se cargarán DESPUÉS
     // de notificaciones.js y global.js.
     block scripts
-
