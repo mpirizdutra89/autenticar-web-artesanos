@@ -6,8 +6,11 @@ const path = require('path');
 require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
 
 
-// --- Importaciones de Redis para express-session (ya las tienes) ---
-const RedisStore = require('connect-redis').default; // Asegúrate de usar .default si es para versiones recientes de connect-redis
+// --- Importaciones de Redis para express-session ---
+// CORRECCIÓN AQUÍ: Importa la función de factoría y pásale la función de session.
+// Esto es el patrón correcto para la mayoría de las versiones modernas de connect-redis.
+const connectRedis = require('connect-redis');
+const RedisStore = connectRedis(session); // Pasa 'session' al 'connect-redis'
 const { createClient } = require('redis');
 
 // --- NUEVAS IMPORTACIONES PARA SOCKET.IO Y REDIS ADAPTER ---
@@ -65,7 +68,7 @@ app.set('trust proxy', 1);
 
     // Configuración del middleware de sesión de Express
     const sessionMiddleware = session({
-        store: new RedisStore({ client: redisClient }),
+        store: new RedisStore({ client: redisClient }), // Ahora RedisStore es una función constructor válida
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
