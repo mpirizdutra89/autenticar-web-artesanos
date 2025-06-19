@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalOpenClose(false, 'createAlbumModal')
             formGlobalErrorElement.textContent = ''
 
-
+            window.location.reload()
 
         } catch (error) {
 
