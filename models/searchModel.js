@@ -79,7 +79,8 @@ async function searchAlbumsByTitle(query) {
         { id: 102, title: 'Ecos del Tiempo', artist: 'Solista Y' },
         { id: 103, title: 'Luces de Ciudad', artist: 'Grupo Z' },
         { id: 104, title: 'Sueños Perdidos', artist: 'Cantante A' },
-        { id: 105, title: 'Noches Blancas', artist: 'Dúo B' },
+        { id: 105, title: 'Noches Blancas', artist: 'Duo B' },
+        { id: 105, title: 'Martin Blancas', artist: 'Duo B' }
     ];
     return dummyAlbums.filter(album =>
         album.title.toLowerCase().includes(query.toLowerCase())

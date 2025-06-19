@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const query = searchInput.value.trim();
 
-        if (query.length < 2) { // Evitar búsquedas con pocos caracteres
+        if (query.length < 3) { // Evitar búsquedas con pocos caracteres
             searchResultsDiv.innerHTML = '';
             searchResultsDiv.style.display = 'none'; // Ocultar si no hay resultados o query corta
             return;
@@ -96,7 +96,7 @@ function renderSearchResults(data) {
             const albumElement = document.createElement('div');
             albumElement.classList.add('search-result-item');
             albumElement.innerHTML = `
-                <span class="icon">🎵</span>
+                <span class="icon">🖼️</span>
                 <span class="name">${album.title}</span>
                 <span class="meta">${album.artist || ''}</span>
             `;
