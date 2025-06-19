@@ -43,7 +43,7 @@ app.use(express.json());
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-// Necesario si estás detrás de Nginx
+//https
 app.set('trust proxy', 1);
 // --- Función asíncrona autoejecutable para iniciar la aplicación ---
 (async () => {
@@ -140,7 +140,7 @@ app.set('trust proxy', 1);
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24,
                 httpOnly: true,
-                secure: false //para sitios https si no false
+                secure: true //para sitios https si no false
             }
         })(socket.request, {}, next);
     });
