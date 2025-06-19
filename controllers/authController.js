@@ -248,7 +248,7 @@ const authController = {
             }
 
             // Construir el enlace de verificación
-            const verificationLink = `${config.appBaseUrl}/usuario/verify-email?token=${verificationToken}`;
+            const verificationLink = `${config.appBaseUrl}usuario/verify-email?token=${verificationToken}`;
 
             // Enviar el correo de verificación
 
