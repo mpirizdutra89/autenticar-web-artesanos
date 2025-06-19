@@ -72,7 +72,7 @@ app.set('trust proxy', 1);
         cookie: {
             maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie (1 día)
             httpOnly: true, // La cookie solo es accesible a través de HTTP(S) y no JavaScript
-            secure: true // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
+            secure: false // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
         }
     });
 
@@ -134,7 +134,7 @@ app.set('trust proxy', 1);
             // El 'origin' debe ser el dominio de tu frontend tal como lo ve el navegador (a través de Nginx)
             origin: "https://artesanos.mpiridutra.site",
             methods: ["GET", "POST"], // Métodos HTTP permitidos para el handshake inicial
-            credentials: true // Permite el envío de cookies de sesión a través de CORS
+            credentials: false // Permite el envío de cookies de sesión a través de CORS
         },
         // Configura el nivel de logging de Socket.IO para depuración (1 para info, 2 para debug)
         // Esto mostrará más mensajes en la consola de tu servidor Node.js sobre la conexión.
