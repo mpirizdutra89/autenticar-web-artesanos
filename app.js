@@ -127,7 +127,7 @@ app.set('trust proxy', 1);
     });
 
     console.log("--------- Variables de entorno-----------------")
-    console.log(JSON.stringify(process.env.env_production))
+    console.log(JSON.stringify(process.env))
     console.log("--------------------------")
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
     const urlDomain = process.env.HOST ? `http://${HOST}:${PORT}` : 'http://artesanos.mpiridutra.site'
