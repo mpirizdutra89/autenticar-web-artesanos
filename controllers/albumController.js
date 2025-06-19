@@ -1,6 +1,7 @@
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 const UPLOAD_DIR = path.join(__dirname, '../uploads');
+const UPLOADS_BASE_DIR = path.join(process.cwd(), 'uploads');
 const activeTab = 'albums'
 const AlbumModel = require('../models/albumModel');
 const { resolveObjectURL } = require('buffer');
@@ -64,8 +65,16 @@ const getAlbumImages = async (req, res) => {
     }
 }
 
-const getDeletObra = async (req, res) => {
-
+const getDeletObraa = async (req, res) => {
+    const respuesta = {
+        ok: false,
+        data: 0,
+        message: 'Falta la referencia del foto'
+    }
+    const obraId = req.params.id;
+    respuesta.ok = true
+    respuesta.data = obraId
+    return res.status(200).json(respuesta);
 }
 
 const getAdministrarObras = async (req, res) => {
@@ -92,11 +101,11 @@ const getAdministrarObras = async (req, res) => {
     });
 }
 
-const deleteObra = async (req, res) => {
+const getDeletObra = async (req, res) => {
     const idobra = req.params.id
     const fs = require('fs').promises; // Importa la versión con promesas de fs
     const path = require('path');
-    const UPLOADS_BASE_DIR = path.join(process.cwd(), 'uploads');
+
     let repuesta = {
         ok: false,
         mjs: 'Falta la rederencia de la obra',
@@ -111,21 +120,22 @@ const deleteObra = async (req, res) => {
 
 
         const obras = await AlbumModel.findByIdObras(idobra)
+
         if (!obras) {
             repuesta.msj = 'No exite la obra'
             return res.status(403).json(repuesta);
         }
+        const rutaObra = obras.url
 
-        const result = await AlbumModel.deleteObras(idobra)
+        const result = await AlbumModel.deleteObras(idobra)// se podria hacer un rollbak si la foto no se puede eliminar pero no tengo tiempo, se puede implmentar
         if (!result > 0) {
             repuesta.msj = 'No se pudo elminar el registro'
             return res.status(403).json(repuesta);
         }
-        const rutaRelativaFoto = obras.url
 
 
 
-        const eliminada = await eliminarFotoEspecifica(rutaRelativaFoto);
+        const eliminada = await eliminarFotoEspecifica(rutaObra);
         if (eliminada) {
             console.log('Proceso de eliminación de foto completado.');
             repuesta.ok = true
@@ -151,14 +161,14 @@ const deleteObra = async (req, res) => {
     //--- 1. Define tu directorio base de uploads-- -
     // Asume que tu carpeta 'uploads' está en la raíz de tu proyecto.
     // `process.cwd()` te da la ruta del directorio de trabajo actual de Node.js.
-    //const UPLOADS_BASE_DIR = path.join(process.cwd(), 'uploads');
+
     // Si tu carpeta 'uploads' está en otro lugar, ajusta esta ruta.
     // Ejemplo: path.join(__dirname, '..', 'uploads'); si 'uploads' está un nivel arriba de donde está tu script.
 
     async function eliminarFotoEspecifica(rutaRelativaFoto) {
         // 2. Construye la ruta absoluta completa del archivo
         const rutaAbsolutaFoto = path.join(UPLOADS_BASE_DIR, rutaRelativaFoto);
-
+        console.log(rutaAbsolutaFoto)
         try {
             await fs.unlink(rutaAbsolutaFoto);
             console.log(`Foto '${rutaRelativaFoto}' eliminada con éxito.`);

@@ -60,14 +60,18 @@ document.addEventListener('DOMContentLoaded', () => {
             modalGenerico(true, 'manageAlbumWorksModal')
         })
 
-        subirImg();
+
+
+        subirImg(obrasList);
     }
+
+
 
 
 
 });
 
-function subirImg() {
+function subirImg(obrasList) {
 
     const selectedFilesMap = new Map();
     let fileCounter = 0;
@@ -137,15 +141,36 @@ function subirImg() {
         }
     })
 
+
+
     elements.confirmDeleteBtn.addEventListener('click', async (event) => {
         //console.log(IDobraDelete)
-        modalGenerico(false, 'mdSioNo')
+
         try {
-            const response = await fetch(`/album/album-administrar/delete/${albumId}`);
+            const response = await fetch(`/album/album-administrar/delete/${IDobraDelete}`);
+            if (!response.ok) {
+                console.log(response)
+                showFloatingAlert('No se puede borra la imagen', 'danger', 'bottom', 3000)
+                return;
+            }
+
+            const res = await response.json();
+            if (res.ok) {
+                showFloatingAlert(res.msj, 'success', 'bottom', 3000)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2100);
+
+
+            }
+
         }
         catch (error) {
 
+            console.log(error)
+            showFloatingAlert('Ocurrio un fallo en el servidor', 'danger', 'bottom', 3000)
         }
+        modalGenerico(false, 'mdSioNo')
 
     })
 
@@ -260,6 +285,7 @@ function subirImg() {
             elements.imagePreviewContainer.innerHTML = '<p id="noImagesText">No hay imágenes seleccionadas.</p>';
             selectedFilesMap.clear();
             updateUploadButtonState();
+            window.location.reload();
 
         } catch (error) {
             console.error('Error al subir imágenes:');
@@ -280,6 +306,7 @@ function subirImg() {
 const loadImg = (obras) => {
     //`idimage`, `albums_idAlbums`, `detalle`, `url`, `fecha_subida`
     obras.forEach(obra => {
+        console.log(`${RAIZ}${obra.url}`)
         const img = {
             id: obra.idimage,
             portadaUrl: `${RAIZ}${obra.url}`,

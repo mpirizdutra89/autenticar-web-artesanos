@@ -19,8 +19,8 @@ class AlbumModel {
     static async findByIdObras(id) {
         try {
             const [rows] = await pool.execute(`SELECT * FROM ${AlbumModel.tabla_img} WHERE idimage= ? `, [id]);//`SELECT * FROM ${AlbumModel.tabla_img}  WHERE albums_idAlbums = ?`, [id]);
-            // if (rows && rows[0]) { return rows[0]; } // poisblemnte no haga falta [0] , pero como funciona no lo toco.. no tengo tiempo pra estas boludesde
-            return rows || [];
+            if (rows && rows[0]) { return rows[0]; } // poisblemnte no haga falta [0] , pero como funciona no lo toco.. no tengo tiempo pra estas boludesde
+            return [];
         } catch (error) {
             console.error('Error al buscar album por ID:', error);
             throw error;

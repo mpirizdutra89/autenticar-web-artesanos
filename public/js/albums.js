@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
+    var RAIZ = '/uploads/'
     const loadCarouselItems = (images, startIndex) => {
 
         elements.carouselInner.innerHTML = '';
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const carouselItem = document.createElement('div');
             carouselItem.className = `carousel-item${index === startIndex ? ' active' : ''}`;
             carouselItem.innerHTML = `
-                    <img src="${image.url}" class="d-block w-100" alt="${image.detalle}">
+                    <img src="${RAIZ}${image.url}" class="d-block w-100" alt="${image.detalle}">
                     <div class="carousel-caption d-none d-md-block">                       
                         <p>${image.detalle}</p>
                     </div>

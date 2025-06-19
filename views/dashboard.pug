@@ -37,16 +37,11 @@ block content
 
 block append scripts
   script.
-      // El JavaScript del cliente Socket.IO y manejo de notificaciones
-      const socket = io('https://artesanos.mpiridutra.site', {
-        transports: ['websocket', 'polling'], // Aún especificamos esto para la prioridad
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-        timeout: 20000,
-        autoConnect: true,
-      // NO se envían 'query' ni 'extraHeaders' aquí para el token
-    });
+      
+        const socket = io('http://localhost:3003', {
+          transports: ['websocket', 'polling'],
+        
+        });
 
     const notificationList = document.getElementById('notification-list-container');
     const notificationCountBadge = document.getElementById('notification-count');
