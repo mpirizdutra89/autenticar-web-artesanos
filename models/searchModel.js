@@ -5,7 +5,7 @@
 // o un cliente de base de datos (pg, mysql, tedious)
 // y harías las consultas SQL o NoSQL apropiadas.
 
-// const db = require('./db'); // Si tienes un archivo db.js para la conexión
+const UserModelo = require('../models/UserModel');
 
 const globalSearch = async (query) => {
     // Escapa la query para evitar inyección SQL si estás usando consultas directas
@@ -19,11 +19,7 @@ const globalSearch = async (query) => {
     };
 
     try {
-        // --- SIMULACIÓN DE CONSULTAS ---
-        // Aquí es donde iría tu lógica real de base de datos.
-        // Por ejemplo, para PostgreSQL con 'pg'
-        // const { rows: userRows } = await db.query('SELECT id, name, email FROM users WHERE name ILIKE $1 OR email ILIKE $1 LIMIT 5', [`%${query}%`]);
-        // results.users = userRows;
+
 
         // Simulamos resultados para usuarios
         results.users = await searchUsers(escapedQuery);
@@ -46,13 +42,8 @@ const globalSearch = async (query) => {
 // Reemplaza estas funciones con tus consultas reales a la base de datos
 
 async function searchUsers(query) {
-    // Ejemplo de búsqueda en una tabla 'users' por 'name' o 'email'
-    // En SQL sería algo como:
-    // SELECT id, name, email FROM users WHERE name LIKE '%${query}%' OR email LIKE '%${query}%' LIMIT 5;
-    // O con MongoDB (Mongoose):
-    // return User.find({ $or: [{ name: { $regex: query, $options: 'i' } }, { email: { $regex: query, $options: 'i' } }] }).limit(5);
 
-    // Simulación con datos estáticos
+    /* // Simulación con datos estáticos
     const dummyUsers = [
         { id: 1, name: 'Martín Pérez', email: 'martin.p@example.com' },
         { id: 2, name: 'Ana García', email: 'ana.g@example.com' },
@@ -63,7 +54,11 @@ async function searchUsers(query) {
     return dummyUsers.filter(user =>
         user.name.toLowerCase().includes(query.toLowerCase()) ||
         user.email.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5); // Limitar a 5 resultados
+    ).slice(0, 5); // Limitar a 5 resultados */
+    const foundUsers = await UserModelo.searchUsers(query);
+    console.log(`Buscar usuario......${query}`)
+    console.log(foundUsers);
+    return foundUsers;
 }
 
 async function searchAlbumsByTitle(query) {
