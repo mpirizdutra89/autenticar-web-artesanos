@@ -69,7 +69,7 @@ app.set('trust proxy', 1);
         cookie: {
             maxAge: 1000 * 60 * 60 * 24,
             httpOnly: true,
-            secure: true
+            secure: false //true en local me deniega el acceso
         }
     }));
 
