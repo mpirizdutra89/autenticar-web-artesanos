@@ -25,7 +25,7 @@ import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isOb
     // NO se envían 'query' ni 'extraHeaders' aquí para el token
 }); */
 
-const socket = io('http://artesanos.mpiridutra.site', {
+const socket = io('http://artesanos.mpirizdutra.site/', {
     transports: ['websocket', 'polling'],
     // ... otras opciones
 });
