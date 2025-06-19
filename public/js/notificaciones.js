@@ -1,5 +1,5 @@
 
-const socket = io();
+const socket = io('https://artesanos.mpiridutra.site');
 
 import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isObjectEmpty } from './funcionesjs/utils.js';
 //#notificacion-container   #nrNotificacion
