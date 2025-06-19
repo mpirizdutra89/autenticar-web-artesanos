@@ -44,7 +44,7 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 //https
-//app.set('trust proxy', 1);
+app.set('trust proxy', 1);
 // --- Función asíncrona autoejecutable para iniciar la aplicación ---
 (async () => {
     // 1. Configuración y Conexión a Redis para SESSIONS

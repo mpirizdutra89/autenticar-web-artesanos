@@ -1,7 +1,5 @@
 
-const socket = io( , {
-    withCredentials: true
-});
+const socket = io();
 
 import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isObjectEmpty } from './funcionesjs/utils.js';
 //#notificacion-container   #nrNotificacion
