@@ -15,7 +15,7 @@ import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isOb
     autoConnect: true, // Conectar automáticamente
 
 }); */
-const socket = io('https://artesanos.mpiridutra.site', {
+/* const socket = io('https://artesanos.mpiridutra.site', {
     transports: ['websocket', 'polling'], // Aún especificamos esto para la prioridad
     reconnection: true,
     reconnectionAttempts: 5,
@@ -23,8 +23,12 @@ const socket = io('https://artesanos.mpiridutra.site', {
     timeout: 20000,
     autoConnect: true,
     // NO se envían 'query' ni 'extraHeaders' aquí para el token
-});
+}); */
 
+const socket = io('http://artesanos.mpiridutra.site', {
+    transports: ['websocket', 'polling'],
+    // ... otras opciones
+});
 
 const notificationList = document.getElementById('notification-list-container')
 const notificationCountBadge = document.getElementById('notification-count')
