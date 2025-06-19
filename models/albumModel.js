@@ -49,6 +49,48 @@ class AlbumModel {
         }
     }
 
+    //################ Buscador ##############
+    static async searchAlbumPortafolio(query) { //solo si es publico  y portafolio , solo me falta los compartidos, el tema es que necesito un procedimineto mas copado
+        let connection;
+        try {
+            connection = await pool.getConnection(); // Obtenemos una conexión del pool
+
+            // Pasamos la 'query' a ambos parámetros del procedimiento almacenado
+            const [rows] = await connection.execute(
+                'CALL buscar_album_portafolio_publico(?)',
+                [query]
+            );
+
+            const results = rows[0];
+
+            // Verificamos si el procedimiento nos devolvió un mensaje de error
+            if (results && results.length > 0 && results[0].Mensaje) {
+                console.warn("Mensaje del procedimiento:", results[0].Mensaje);
+                return []; // Retorna un array vacío si el SP devolvió un mensaje de error
+            }
+
+            // Mapeamos los resultados de la base de datos al formato deseado
+            // y ¡quitamos el .slice(0, 5)!
+            return results.map(userRow => ({
+                id: userRow.idAlbum,
+                titulo: userRow.titulo ? `${userRow.titulo}`.trim() : null,
+                artista: userRow.artista ? `${userRow.artista}`.trim() : null,
+                directorio: userRow.directorio ? userRow.directorio : null
+            }));
+
+        } catch (error) {
+            console.error('Error al buscar Album en la base de datos:', error);
+            throw new Error('Fallo en la búsqueda de Album: ' + error.message);
+        } finally {
+            if (connection) {
+                connection.release(); // Siempre liberamos la conexión
+            }
+        }
+    }
+
+
+    //######################################
+
     static async all(user_id, tipo = 'normal') {
         try {
 

@@ -6,6 +6,7 @@
 // y harías las consultas SQL o NoSQL apropiadas.
 
 const UserModelo = require('../models/UserModel');
+const AlbumModel = require('../models/albumModel')
 
 const globalSearch = async (query) => {
     // Escapa la query para evitar inyección SQL si estás usando consultas directas
@@ -69,7 +70,7 @@ async function searchAlbumsByTitle(query) {
     // return Album.find({ title: { $regex: query, $options: 'i' } }).limit(5);
 
     // Simulación con datos estáticos
-    const dummyAlbums = [
+    /* const dummyAlbums = [
         { id: 101, title: 'Revolución Sonora', artist: 'Banda X' },
         { id: 102, title: 'Ecos del Tiempo', artist: 'Solista Y' },
         { id: 103, title: 'Luces de Ciudad', artist: 'Grupo Z' },
@@ -79,7 +80,11 @@ async function searchAlbumsByTitle(query) {
     ];
     return dummyAlbums.filter(album =>
         album.title.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5); // Limitar a 5 resultados
+    ).slice(0, 5); // Limitar a 5 resultados */
+    const foundUsers = await AlbumModel.searchAlbumPortafolio(query);
+    console.log(`Buscar Album portafolio solo publico......${query}`)
+    console.log(foundUsers);
+    return foundUsers;
 }
 
 async function searchAlbumsByTag(query) {

@@ -97,8 +97,8 @@ function renderSearchResults(data) {
             albumElement.classList.add('search-result-item');
             albumElement.innerHTML = `
                 <span class="icon">🖼️</span>
-                <span class="name">${album.title}</span>
-                <span class="meta">${album.artist || ''}</span>
+                <span class="name">${album.titulo}</span>
+                <span class="meta">${album.artista || ''}</span>
             `;
             albumElement.addEventListener('click', () => {
                 // Aquí puedes redirigir a la página del álbum
