@@ -127,13 +127,13 @@ app.set('trust proxy', 1);
     });
 
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
-
+    const urlDomain = process.env.HOST ? 'http://localhost:3003' : 'http://artesanos.mpiridutra.site'
     const server = require('http').createServer(app);
     // Aquí es donde añades la configuración de CORS a la instancia de Socket.IO
     const io = new Server(server, {
         cors: {
             // El 'origin' debe ser HTTP para tu frontend
-            origin: 'http://localhost:3003',//"http://artesanos.mpiridutra.site", // <-- CAMBIO CLAVE: CÁMBIALO a 'http://'
+            origin: urlDomain,//"http://artesanos.mpiridutra.site", // <-- CAMBIO CLAVE: CÁMBIALO a 'http://'
             methods: ["GET", "POST"], // Métodos HTTP permitidos para el handshake inicial
             credentials: true // Permite el envío de cookies de sesión a través de CORS
         },
