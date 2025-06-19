@@ -192,7 +192,16 @@ app.set('trust proxy', 1);
 
             // Enviar notificaciones no leídas al usuario cuando se conecta
             // (Esta parte se completará en el controlador)
-            // socket.emit('notificaciones_iniciales', [...notificacionesNoLeidas]);
+            const noti = {
+                id: 65,
+                id_usuario: 30,
+                tipo_notificacion: 'otro_tipo',
+                id_referencia: null,
+                mensaje: '¡Hola nicolas! Esta es una notificación de prueba desde el servidor para ti.',
+                leida: 0,
+                fecha_creacion: '2025-06 - 19T07: 20: 30.000Z'
+            }
+            socket.emit('notificaciones_iniciales', [...[noti]]);
         } else {
             // Este `else` solo se ejecutará si se llamó a `next()` sin un error en el middleware
             // pero el usuario no tiene session.user. Esto no debería ocurrir con la lógica actual,
