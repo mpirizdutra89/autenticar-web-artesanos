@@ -5,8 +5,8 @@ const path = require('path');
 
 require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
 
-// --- Importaciones de Redis para express-session ---
-// CORRECCIÓN: Pasa la instancia de 'session' directamente a 'connect-redis'
+
+// --- Importaciones de Redis para express-session (ya las tienes) ---
 const { RedisStore } = require('connect-redis');
 const { createClient } = require('redis');
 
@@ -43,11 +43,8 @@ app.use(express.json());
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-// Habilita 'trust proxy' ya que Nginx actúa como un proxy inverso.
-// Esto es crucial para que Express maneje correctamente los encabezados X-Forwarded-For y X-Forwarded-Proto.
-// Aunque no uses HTTPS, Nginx sigue siendo un proxy.
+// Necesario si estás detrás de Nginx
 app.set('trust proxy', 1);
-
 // --- Función asíncrona autoejecutable para iniciar la aplicación ---
 (async () => {
     // 1. Configuración y Conexión a Redis para SESSIONS
@@ -61,23 +58,20 @@ app.set('trust proxy', 1);
         await redisClient.connect();
     } catch (err) {
         console.error('❌ No se pudo conectar a Redis para Sesiones. Error:', err);
-        process.exit(1); // Sale de la aplicación si no puede conectar a Redis para sesiones
+        process.exit(1);
     }
 
-    // Configuración del middleware de sesión de Express
-    const sessionMiddleware = session({
+    app.use(session({
         store: new RedisStore({ client: redisClient }),
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie (1 día)
-            httpOnly: true, // La cookie solo es accesible a través de HTTP y no JavaScript
-            secure: false // CORRECTO para HTTP
+            maxAge: 1000 * 60 * 60 * 24,
+            httpOnly: true,
+            secure: false //true en local me deniega el acceso
         }
-    });
-
-    app.use(sessionMiddleware);
+    }));
 
 
     // Clientes de Redis para el adaptador de Socket.IO (necesita dos clientes: pub y sub)
@@ -95,7 +89,7 @@ app.set('trust proxy', 1);
     } catch (err) {
         console.error('❌ No se pudo conectar a Redis para Socket.IO. Error:', err);
         // Puedes decidir si la app debe fallar aquí o seguir sin real-time notifications
-        process.exit(1); // Sale de la aplicación si no puede conectar a Redis para Socket.IO
+        process.exit(1);
     }
 
     // APLICA EL MIDDLEWARE loadUserIntoView GLOBALMENTE
@@ -129,54 +123,33 @@ app.set('trust proxy', 1);
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
 
     const server = require('http').createServer(app);
-    // Aquí es donde añades la configuración de CORS a la instancia de Socket.IO
-    const io = new Server(server, {
-        cors: {
-            // El 'origin' debe ser HTTP para tu frontend
-            origin: "http://artesanos.mpiridutra.site", // <-- CAMBIO CLAVE: CÁMBIALO a 'http://'
-            methods: ["GET", "POST"], // Métodos HTTP permitidos para el handshake inicial
-            credentials: true // Permite el envío de cookies de sesión a través de CORS
-        },
-        transports: ['websocket', 'polling'], // Priorizar websocket
-        allowUpgrades: true, // Permitir la actualización de polling a websocket
-    });
+    const io = new Server(server); // Conectar Socket.IO al servidor HTTP
 
     // Usar el adaptador de Redis para Socket.IO (para escalabilidad)
     io.adapter(createAdapter(pubClient, subClient));
 
-    // Middleware de Socket.IO para compartir la sesión de Express y manejar la autenticación
+    // Middleware de Socket.IO para compartir la sesión de Express
+    // Esto es CRUCIAL para acceder a `req.session.user` en las conexiones de Socket.IO
     io.use((socket, next) => {
-        // Primero, intentamos cargar la sesión de Express
-        sessionMiddleware(socket.request, {}, async () => {
-            // --- Lógica de decisión final de autenticación para Socket.IO ---
-            // Si el usuario NO está autenticado por la sesión de Express:
-            if (!socket.request.session.user) {
-                console.log('Socket.IO: Conexión rechazada - Usuario no autenticado por sesión.');
-                // Envía un error personalizado al cliente para que sepa por qué falló
-                return next(new Error('Authentication required via Express session for WebSocket connection.'));
+        // Convierte el middleware de express-session en un middleware de Socket.IO
+        session({
+            store: new RedisStore({ client: redisClient }), // Reusa la misma configuración de store
+            secret: SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                maxAge: 1000 * 60 * 60 * 24,
+                httpOnly: true,
+                secure: false //para sitios https si no false
             }
-
-            // Si el usuario está autenticado por sesión, permite la conexión
-            console.log('Socket.IO: Usuario autenticado por sesión. Permitiendo conexión.');
-            next();
-        });
-    });
-
-    // --- Manejo de errores generales de Socket.IO en el servidor ---
-    io.on('error', (error) => {
-        console.error('❌ Socket.IO Server Error:', error);
+        })(socket.request, {}, next);
     });
 
     // Lógica de conexión de Socket.IO
     io.on('connection', (socket) => {
         console.log('Un usuario se ha conectado al Socket.IO:', socket.id);
 
-        // Agrega un manejador de errores específico para este socket
-        socket.on('error', (error) => {
-            console.error(`❌ Socket Error para ${socket.id}:`, error);
-        });
-
-        // Obtener el ID del usuario de la sesión de Express
+        // Intenta obtener el ID del usuario de la sesión de Express
         const userId = socket.request.session.user?.id;
 
         if (userId) {
@@ -189,14 +162,11 @@ app.set('trust proxy', 1);
             // (Esta parte se completará en el controlador)
             // socket.emit('notificaciones_iniciales', [...notificacionesNoLeidas]);
         } else {
-            // Este `else` solo se ejecutará si se llamó a `next()` sin un error en el middleware
-            // pero el usuario no tiene session.user. Esto no debería ocurrir con la lógica actual,
-            // pero es un buen fallback.
-            console.log('Usuario no autenticado conectado a Socket.IO. No se unirá a ninguna sala específica (esto no debería ocurrir si el middleware previo funciona correctamente).');
+            console.log('Usuario no autenticado conectado a Socket.IO. No se unirá a ninguna sala específica.');
         }
 
-        socket.on('disconnect', (reason) => {
-            console.log(`Un usuario se ha desconectado del Socket.IO: ${socket.id}. Razón: ${reason}`);
+        socket.on('disconnect', () => {
+            console.log('Un usuario se ha desconectado del Socket.IO:', socket.id);
             if (userId) {
                 // Opcional: Abandonar la sala al desconectar
                 socket.leave(`user_${userId}`);
