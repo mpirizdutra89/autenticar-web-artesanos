@@ -29,6 +29,7 @@ const socket = io(obtenerBaseUrlNavegador(), {
     transports: ['websocket', 'polling'],
     // ... otras opciones
 });
+console.log(obtenerBaseUrlNavegador())
 
 const notificationList = document.getElementById('notification-list-container')
 const notificationCountBadge = document.getElementById('notification-count')
