@@ -27,6 +27,11 @@ import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isOb
 
 const socket = io(obtenerBaseUrlNavegador(), {
     transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    timeout: 20000,
+    autoConnect: true,
     // ... otras opciones
 });
 console.log(obtenerBaseUrlNavegador())
