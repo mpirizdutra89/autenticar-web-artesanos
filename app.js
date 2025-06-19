@@ -9,7 +9,7 @@ require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en 
 // --- Importaciones de Redis para express-session ---
 // CORRECCIÓN FINAL AQUÍ: Llama directamente a 'require('connect-redis')' como una función
 // y pásale la instancia de 'session'.
-const RedisStore = require('connect-redis')(session); // <--- CAMBIO CLAVE AQUÍ
+const { RedisStore } = require('connect-redis');
 const { createClient } = require('redis');
 
 // --- NUEVAS IMPORTACIONES PARA SOCKET.IO Y REDIS ADAPTER ---
@@ -66,8 +66,8 @@ app.set('trust proxy', 1);
     }
 
     // Configuración del middleware de sesión de Express
-    const sessionMiddleware = session({
-        store: new RedisStore({ client: redisClient }), // Ahora RedisStore es una función constructor válida
+    app.use(session({
+        store: new RedisStore({ client: redisClient }),
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
@@ -76,9 +76,9 @@ app.set('trust proxy', 1);
             httpOnly: true, // La cookie solo es accesible a través de HTTP(S) y no JavaScript
             secure: true // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
         }
-    });
+    }));
 
-    app.use(sessionMiddleware);
+
 
 
     // Clientes de Redis para el adaptador de Socket.IO (necesita dos clientes: pub y sub)
