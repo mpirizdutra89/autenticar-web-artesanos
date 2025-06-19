@@ -15,7 +15,7 @@ import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isOb
     autoConnect: true, // Conectar automáticamente
 
 }); */
-const socket = io('https://artesanos.mpiridutra.site:3003', {
+const socket = io('https://artesanos.mpiridutra.site', {
     transports: ['websocket', 'polling'], // Aún especificamos esto para la prioridad
     reconnection: true,
     reconnectionAttempts: 5,

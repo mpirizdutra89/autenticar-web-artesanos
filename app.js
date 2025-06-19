@@ -71,7 +71,7 @@ app.set('trust proxy', 1);
         cookie: {
             maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie (1 día)
             httpOnly: true, // La cookie solo es accesible a través de HTTP(S) y no JavaScript
-            secure: true // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
+            secure: false // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
         }
     });
 
