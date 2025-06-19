@@ -128,6 +128,7 @@ app.set('trust proxy', 1);
 
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
     const urlDomain = process.env.HOST ? 'http://localhost:3003' : 'http://artesanos.mpiridutra.site'
+    console.log("DOMAIN actual:", urlDomain)
     const server = require('http').createServer(app);
     // Aquí es donde añades la configuración de CORS a la instancia de Socket.IO
     const io = new Server(server, {
