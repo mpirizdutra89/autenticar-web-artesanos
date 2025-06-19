@@ -43,6 +43,15 @@ block append scripts
         
         });
 
+        function obtenerBaseUrlNavegador() {
+            const urlObj = new URL(window.location.href);
+            let baseUrl = `${urlObj.protocol}//${urlObj.hostname}`;
+            if (urlObj.port) {
+                baseUrl += `:${urlObj.port}`;
+            }
+         return baseUrl;
+        }
+
     const notificationList = document.getElementById('notification-list-container');
     const notificationCountBadge = document.getElementById('notification-count');
     const noNotificationsMessage = document.getElementById('no-notifications');
