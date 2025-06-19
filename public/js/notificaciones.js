@@ -13,7 +13,7 @@ const socket = io('https://artesanos.mpiridutra.site', {
     timeout: 20000, // Tiempo de espera para conectar (en milisegundos)
     //  query: { token: 'mi_token_aqui' }, // Pasar parámetros en la query string
     autoConnect: true, // Conectar automáticamente
-    extraHeaders: { 'Authorization': 'Bearer mi_token_de_autorizacion' } // Headers adicionales
+
 });
 
 
