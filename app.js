@@ -131,7 +131,7 @@ app.set('trust proxy', 1);
     console.log(JSON.stringify(process.env.NODE_ENV))
     console.log("--------------------------")
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
-    const urlDomain = process.env.HOST ? `http://${HOST}:${PORT}` : 'http://artesanos.mpiridutra.site'
+    const urlDomain = process.env.NODE_ENV === 'production' ? 'http://artesanos.mpiridutra.site' : `http://${HOST}:${PORT}`
     console.log("DOMAIN actual:", urlDomain)
     const server = require('http').createServer(app);
     // Aquí es donde añades la configuración de CORS a la instancia de Socket.IO
