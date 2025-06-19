@@ -13,7 +13,7 @@ const config = {
             pass: PASSEMAIL
         }
     },
-    appBaseUrl: process.env.NODE_ENV === 'production' ? 'http://artesanos.mpiridutra.site' : `http://localhost:3003` //`http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3003}` // URL base de tu aplicación frontend
+    appBaseUrl: process.env.NODE_ENV === 'production' ? 'http://artesanos.mpirizdutra.site/' : 'http://localhost:3003' //`http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3003}` // URL base de tu aplicación frontend
 };
 
 module.exports = config;
