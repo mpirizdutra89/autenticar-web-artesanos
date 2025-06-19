@@ -322,7 +322,7 @@ function crearItemPersonalisado(notif, final = false) {
         }
 
         default: {
-            notificationItem.innerHTML += "<a class='dropdown-item text-center text-warning' href='./panel-notificacion/'> Ver todas las notificaciones</a>"
+            notificationItem.innerHTML += "<a class='dropdown-item text-center text-warning' href='/panel-notificacion/'> Ver todas las notificaciones</a>"
             break
         }
 
