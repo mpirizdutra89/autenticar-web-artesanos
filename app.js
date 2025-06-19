@@ -5,9 +5,8 @@ const path = require('path');
 
 require('dotenv').config(); // Carga variables desde .env SOLO si NO estamos en producción
 
-
 // --- Importaciones de Redis para express-session ---
-const { RedisStore } = require('connect-redis');
+const { RedisStore } = require('connect-redis'); // Pasa 'session' al 'connect-redis'
 const { createClient } = require('redis');
 
 // --- NUEVAS IMPORTACIONES PARA SOCKET.IO Y REDIS ADAPTER ---
@@ -72,7 +71,7 @@ app.set('trust proxy', 1);
         cookie: {
             maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie (1 día)
             httpOnly: true, // La cookie solo es accesible a través de HTTP(S) y no JavaScript
-            secure: false // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
+            secure: true // 'true' ya que Nginx maneja HTTPS. La cookie solo se envía sobre HTTPS.
         }
     });
 
@@ -134,58 +133,49 @@ app.set('trust proxy', 1);
             // El 'origin' debe ser el dominio de tu frontend tal como lo ve el navegador (a través de Nginx)
             origin: "https://artesanos.mpiridutra.site",
             methods: ["GET", "POST"], // Métodos HTTP permitidos para el handshake inicial
-            credentials: false // Permite el envío de cookies de sesión a través de CORS
+            credentials: true // Permite el envío de cookies de sesión a través de CORS
         },
-        // Configura el nivel de logging de Socket.IO para depuración (1 para info, 2 para debug)
-        // Esto mostrará más mensajes en la consola de tu servidor Node.js sobre la conexión.
-        // Solo para depuración, quítalo en producción.
         transports: ['websocket', 'polling'], // Priorizar websocket
         allowUpgrades: true, // Permitir la actualización de polling a websocket
-        // pingInterval y pingTimeout ya se configuran en el handshake inicial
-        // Si tienes clientes Socket.IO muy antiguos (versiones 2.x o anteriores), podrías necesitar esto:
-        // allowEIO3: true
     });
 
     // Usar el adaptador de Redis para Socket.IO (para escalabilidad)
     io.adapter(createAdapter(pubClient, subClient));
 
-    // Middleware de Socket.IO para compartir la sesión de Express
-    // Esto es CRUCIAL para acceder a `socket.request.session.user` en las conexiones de Socket.IO
+    // Middleware de Socket.IO para compartir la sesión de Express y manejar la autenticación
     io.use((socket, next) => {
-        // *** IMPORTANTE: Manejo del token de la URL si se usa para autenticación ***
-        const token = socket.handshake.query.token;
-        if (token) {
-            console.log(`Socket.IO: Token recibido en la URL: ${token}`);
-            // Aquí deberías añadir tu lógica para validar este token
-            // y, si es válido, adjuntar la información del usuario a `socket.request.user` o similar.
-            // Por ejemplo, si es un JWT:
-            /*
-            try {
-                const decoded = jwt.verify(token, 'TU_SECRETO_JWT');
-                socket.request.user = decoded; // Adjunta el usuario decodificado al request
-                console.log('Socket.IO: Token validado, usuario:', decoded);
-            } catch (err) {
-                console.error('Socket.IO: Error al validar token:', err.message);
-                return next(new Error('Authentication error: Invalid token')); // Rechaza la conexión si el token es inválido
+        // Primero, intentamos cargar la sesión de Express
+        sessionMiddleware(socket.request, {}, async () => {
+            // --- Lógica de decisión final de autenticación para Socket.IO ---
+            // Si el usuario NO está autenticado por la sesión de Express:
+            if (!socket.request.session.user) {
+                console.log('Socket.IO: Conexión rechazada - Usuario no autenticado por sesión.');
+                // Envía un error personalizado al cliente para que sepa por qué falló
+                return next(new Error('Authentication required via Express session for WebSocket connection.'));
             }
-            */
-        } else {
-            console.log('Socket.IO: No se recibió token en la URL de conexión.');
-        }
 
-        // Usa la instancia de sessionMiddleware que ya creaste y pasaste a Express.
-        // Esto asegura que la misma configuración de sesión se use para Express y Socket.IO.
-        sessionMiddleware(socket.request, {}, next);
+            // Si el usuario está autenticado por sesión, permite la conexión
+            console.log('Socket.IO: Usuario autenticado por sesión. Permitiendo conexión.');
+            next();
+        });
+    });
+
+    // --- Manejo de errores generales de Socket.IO en el servidor ---
+    io.on('error', (error) => {
+        console.error('❌ Socket.IO Server Error:', error);
     });
 
     // Lógica de conexión de Socket.IO
     io.on('connection', (socket) => {
         console.log('Un usuario se ha conectado al Socket.IO:', socket.id);
 
-        // Intenta obtener el ID del usuario de la sesión de Express
-        // Ahora también podemos verificar `socket.request.user` si el token fue validado
-        const userId = socket.request.session.user?.id || socket.request.user?.id;
+        // Agrega un manejador de errores específico para este socket
+        socket.on('error', (error) => {
+            console.error(`❌ Socket Error para ${socket.id}:`, error);
+        });
 
+        // Obtener el ID del usuario de la sesión de Express
+        const userId = socket.request.session.user?.id;
 
         if (userId) {
             // Unir al usuario a una "sala" basada en su ID de usuario
@@ -197,14 +187,14 @@ app.set('trust proxy', 1);
             // (Esta parte se completará en el controlador)
             // socket.emit('notificaciones_iniciales', [...notificacionesNoLeidas]);
         } else {
-            console.log('Usuario no autenticado conectado a Socket.IO. No se unirá a ninguna sala específica.');
-            // Opcional: Si la autenticación es estrictamente necesaria para cualquier conexión,
-            // puedes desconectar el socket aquí:
-            // socket.disconnect(true);
+            // Este `else` solo se ejecutará si se llamó a `next()` sin un error en el middleware
+            // pero el usuario no tiene session.user. Esto no debería ocurrir con la lógica actual,
+            // pero es un buen fallback.
+            console.log('Usuario no autenticado conectado a Socket.IO. No se unirá a ninguna sala específica (esto no debería ocurrir si el middleware previo funciona correctamente).');
         }
 
-        socket.on('disconnect', () => {
-            console.log('Un usuario se ha desconectado del Socket.IO:', socket.id);
+        socket.on('disconnect', (reason) => {
+            console.log(`Un usuario se ha desconectado del Socket.IO: ${socket.id}. Razón: ${reason}`);
             if (userId) {
                 // Opcional: Abandonar la sala al desconectar
                 socket.leave(`user_${userId}`);

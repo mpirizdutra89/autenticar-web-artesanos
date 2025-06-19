@@ -4,7 +4,7 @@ import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isOb
 //#notificacion-container   #nrNotificacion
 
 
-const socket = io();
+//const socket = io();
 /* const socket = io('https://artesanos.mpiridutra.site', {
     transports: ['websocket', 'polling'], // Especifica los transportes a utilizar
     reconnection: true, // Habilita la reconexión automática
@@ -15,6 +15,15 @@ const socket = io();
     autoConnect: true, // Conectar automáticamente
 
 }); */
+const socket = io('https://artesanos.mpiridutra.site', {
+    transports: ['websocket', 'polling'], // Aún especificamos esto para la prioridad
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    timeout: 20000,
+    autoConnect: true,
+    // NO se envían 'query' ni 'extraHeaders' aquí para el token
+});
 
 
 const notificationList = document.getElementById('notification-list-container')
