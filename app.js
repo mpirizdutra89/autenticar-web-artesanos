@@ -122,7 +122,7 @@ app.set('trust proxy', 1);
 
     // --- Manejo del Socket.IO (debe ir después de configurar la sesión, para acceder a req.session) ---
 
-    const server = require('https').createServer(app);
+    const server = require('http').createServer(app);
     const io = new Server(server); // Conectar Socket.IO al servidor HTTP
 
     // Usar el adaptador de Redis para Socket.IO (para escalabilidad)
