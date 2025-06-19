@@ -43,7 +43,8 @@ html(lang="es")
                 li
                   hr.dropdown-divider
                 li
-                  a.dropdown-item(href="#") Cerrar Sesión
+                  form(action="/usuario/logout", method="POST")
+                        button.dropdown-item(type="submit") Cerrar Sesión
 
     
     main.container.my-4

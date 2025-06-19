@@ -30,8 +30,8 @@ const loadNotificationsMiddleware = require('./middleware/notificationMiddleware
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003
 const HOST = process.env.HOST ? process.env.HOST : "localhost"
-const SESSION_SECRET = process.env.SESSION_SECRET ? process.env.SESSION_SECRET : "nicolas89"
-const REDIS_URL = process.env.REDIS_URL ? process.env.REDIS_URL : "redis://localhost:6379"
+const SESSION_SECRET = "nicolas89"; //process.env.SESSION_SECRET ? process.env.SESSION_SECRET : "nicolas89"
+const REDIS_URL = "redis://localhost:6379";//process.env.REDIS_URL ? process.env.REDIS_URL : "redis://localhost:6379"
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')))
@@ -43,6 +43,8 @@ app.use(express.json());
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+//https
+app.set('trust proxy', 1);
 // --- Función asíncrona autoejecutable para iniciar la aplicación ---
 (async () => {
     // 1. Configuración y Conexión a Redis para SESSIONS
