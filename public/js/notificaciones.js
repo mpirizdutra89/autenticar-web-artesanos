@@ -25,7 +25,7 @@ import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isOb
     // NO se envían 'query' ni 'extraHeaders' aquí para el token
 }); */
 
-const socket = io('http://localhost:3003', {
+const socket = io(obtenerBaseUrlNavegador(), {
     transports: ['websocket', 'polling'],
     // ... otras opciones
 });
@@ -41,6 +41,15 @@ const notificacionRead = document.getElementById("read")
 const btnTabRead = document.getElementById("read-tab")
 // 'io()' debe estar disponible globalmente gracias al <script src="/socket.io/socket.io.js">
 
+
+function obtenerBaseUrlNavegador() {
+    const urlObj = new URL(window.location.href);
+    let baseUrl = `${urlObj.protocol}//${urlObj.hostname}`;
+    if (urlObj.port) {
+        baseUrl += `:${urlObj.port}`;
+    }
+    return baseUrl;
+}
 
 
 let unreadCount = 0;

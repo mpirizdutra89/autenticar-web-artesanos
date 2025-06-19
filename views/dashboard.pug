@@ -38,7 +38,7 @@ block content
 block append scripts
   script.
       
-        const socket = io('http://localhost:3003', {
+        const socket = io(obtenerBaseUrlNavegador(), {
           transports: ['websocket', 'polling'],
         
         });
