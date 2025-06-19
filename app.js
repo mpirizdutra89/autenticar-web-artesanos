@@ -16,6 +16,7 @@ const { createAdapter } = require('@socket.io/redis-adapter'); // Importa el ada
 
 // Importa los módulos de rutas
 const inicioRoutes = require('./routes/inicio');
+const searchRoute = require('./routes/searchRoute')
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const albumRoutes = require('./routes/albumRoutes')
@@ -111,12 +112,13 @@ app.set('trust proxy', 1);
     app.use('/dashboard', isAuthenticated, dashboardRoutes);
     app.use('/panel-notificacion', isAuthenticated, panelNotificacionesRoutes)
     app.use('/album', isAuthenticated, albumRoutes)
-
+    app.use('/search', searchRoute);
 
 
 
     //manejo de errores gloabales
     app.use(multerErrorHandler);
+
     app.use('/', inicioRoutes);
     // Este middleware debe ir DESPUÉS de TODAS tus rutas definidas
     app.use((req, res, next) => {

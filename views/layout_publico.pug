@@ -23,9 +23,8 @@ html(lang="es")
         .collapse.navbar-collapse#loggedInNavbar.justify-content-between
           .d-flex.align-items-center.search-form
             form.d-flex.me-3.flex-grow-1
-              input.form-control.flex-grow-1.me-2(type="search", placeholder="Buscar álbumes, obras...", aria-label="Search")
-              button.btn.btn-outline-light(type="submit")
-                i.bi.bi-search
+              input.form-control.flex-grow-1.me-2#searchInput(type="search", placeholder="Buscar álbumes, obras...", aria-label="Search")              
+             #searchResults.search-results-dropdown    
           .d-flex.align-items-center#Notificacion-perfil-usuario
             if user
                 if !panel_notificacion
@@ -89,6 +88,7 @@ html(lang="es")
     // Usamos 'block append scripts' para que las vistas que extienden este layout puedan añadir sus propios scripts AQUÍ.
     // Esto asegura que 'notificaciones.js' se cargue antes que cualquier script específico de una vista.
     script(src='/js/notificaciones.js' type="module") // Tu script de notificaciones
+    script(src="/js/buscar.js")//al estar en el loyut public de alguna maenara hay qeu decirselo al script capas una etiqueta ocula en el html  
     script(src="/js/global.js" type="module")         // Tu script global
 
     // Este 'block scripts' se puede usar en tus vistas que extienden el layout

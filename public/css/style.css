@@ -614,3 +614,102 @@ body {
     75% { transform: translate(1px, 1px); }
     100% { transform: translate(0); }
 }
+
+/* CLAVE: ESTE CONTENEDOR ES RELATIVO PARA QUE EL DROPDOWN SEA ABSOLUTO A ÉL */
+.search-box {
+    position: relative; /* Muy importante para posicionar searchResults-dropdown */
+    margin-bottom: 20px; /* Espacio para que no se pegue al contenido de abajo */
+}
+
+#searchInput {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1.1em;
+    border: 1px solid #555;
+    border-radius: 25px;
+    background-color: #444;
+    color: #fff;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#searchInput::placeholder {
+    color: #bbb;
+}
+
+#searchInput:focus {
+    border-color: #888;
+}
+
+/* CLAVE: ESTE ES EL DIV QUE FLOTA */
+.search-results-dropdown {
+    display: none; /* Oculto por defecto, se muestra con JS */
+    position: absolute; /* Posicionamiento absoluto respecto a su padre relativo (.search-box) */
+    top: 100%; /* Empieza justo debajo del input (100% de la altura del input) */
+    left: 0; /* Alineado a la izquierda del input */
+    width: 25%; /* Mismo ancho que el input */
+    background-color: #444;
+    border: 1px solid #555;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    max-height: 400px; /* Limita la altura del scroll */
+    overflow-y: auto; /* Habilita scroll si hay muchos resultados */
+    margin-top: 5px; /* Pequeño espacio entre input y resultados */
+}
+
+.search-category {
+    padding: 10px 0;
+    border-bottom: 1px solid #555;
+}
+
+.search-category:last-child {
+    border-bottom: none;
+}
+
+.search-category h3 {
+    margin: 0 15px 10px;
+    color: #bbb;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #555;
+}
+
+.search-result-item .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: #aaa;
+}
+
+.search-result-item .name {
+    flex-grow: 1;
+    font-weight: bold;
+    color: #fff;
+}
+
+.search-result-item .meta {
+    font-size: 0.8em;
+    color: #ccc;
+    margin-left: 10px;
+}
+
+.no-results, .error-message {
+    padding: 15px;
+    text-align: center;
+    color: #aaa;
+}
+
+.error-message {
+    color: #f00;
+}
