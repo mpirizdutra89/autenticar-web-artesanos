@@ -1,5 +1,5 @@
 // public/js/main.js
-
+import { showFloatingAlert } from './funcionesjs/utils.js';
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const searchResultsDiv = document.getElementById('searchResults');
@@ -56,6 +56,97 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+async function handleFriendRequest(btnEvent) {
+    // event.stopPropagation(); // Evita que el clic se propague al userElement padre
+
+
+    const userId = btnEvent.dataset.userId;
+    const estadouser = btnEvent.dataset.userEstado;
+    const buttonTextSpan = btnEvent.querySelector('.button-text');
+    const spinnerSpan = btnEvent.querySelector('.spinner-border');
+
+    if (estadouser == 0) {
+
+
+        btnEvent.setAttribute('disabled', true);
+        if (buttonTextSpan) { // Asegurarse de que el span existe
+            buttonTextSpan.classList.add('d-none'); // Oculta el texto
+        }
+        if (spinnerSpan) { // Asegurarse de que el spinner existe
+            spinnerSpan.classList.remove('d-none'); // Muestra el spinner
+        }
+
+        try {
+
+            const response = await fetch('/compartir/solicitud-amistad', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Authorization': 'Bearer tu_token_aqui' // Si necesitas autenticación
+                },
+                body: JSON.stringify({ userId: userId, action: 'pendiente' })
+            });
+
+            // 3. Simular un retardo adicional para que el spinner se vea bien (opcional)
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Espera 1.5 segundos
+
+            if (response.ok) {
+
+                const result = await response.json(); // Si esperas un JSON de respuesta
+                console.log('Solicitud enviada, respuesta:', result); // Para depuración
+
+
+
+
+                if (buttonTextSpan) {
+                    buttonTextSpan.textContent = result.status ? result.status : 'Solicitud';
+                    buttonTextSpan.classList.remove('d-none');
+                }
+                if (spinnerSpan) {
+                    spinnerSpan.classList.add('d-none');
+                }
+                btnEvent.classList.remove('btn-primary');
+                btnEvent.classList.add('btn-secondary'); // Cambiar color para indicar estado
+                btnEvent.setAttribute('disabled', true); // Mantener deshabilitado si ya se envió
+                showFloatingAlert(result.message ? result.message : 'Solisitud enviada con exito', 'success', 'bottom', 3000)
+            } else {
+
+                const errorText = await response.text(); // Leer como texto si no es JSON
+                console.error(`Error ${response.status}:`, errorText); // Para depuración
+
+
+
+                if (buttonTextSpan) {
+                    buttonTextSpan.classList.remove('d-none');
+                    buttonTextSpan.textContent = 'Solicitud'; // Volver al texto original
+                }
+                if (spinnerSpan) {
+                    spinnerSpan.classList.add('d-none');
+                }
+                btnEvent.removeAttribute('disabled');
+                showFloatingAlert('Ocurrio un fallo en el envio de la solicitud', 'danger', 'bottom', 5000)
+            }
+        } catch (error) {
+
+            console.error('Error de conexión o al enviar solicitud:', error);
+            //alert(`Hubo un problema de conexión al enviar la solicitud (ID: ${userId}). Intenta de nuevo.`);
+
+
+            if (buttonTextSpan) {
+                buttonTextSpan.classList.remove('d-none');
+                buttonTextSpan.textContent = 'Solicitud'; // Volver al texto original
+            }
+            if (spinnerSpan) {
+                spinnerSpan.classList.add('d-none');
+            }
+            btnEvent.removeAttribute('disabled');
+            showFloatingAlert('Ocurrio un fallo en el envio de la solicitud', 'danger', 'bottom', 5000)
+        }
+    }
+}
+
+
 function renderSearchResults(data) {
     const searchResultsDiv = document.getElementById('searchResults');
     searchResultsDiv.innerHTML = ''; // Limpiar resultados anteriores
@@ -64,25 +155,41 @@ function renderSearchResults(data) {
 
     // Categoría: Usuarios
     if (data.users && data.users.length > 0) {
-        hasResults = true;
+        hasResults = true; // Asegúrate de que hasResults esté definido en el scope correcto
         const usersSection = document.createElement('div');
         usersSection.classList.add('search-category');
         usersSection.innerHTML = '<h3>Usuarios</h3>';
+
         data.users.forEach(user => {
             const userElement = document.createElement('div');
             userElement.classList.add('search-result-item');
+            userElement.classList.add('sinhover'); // Tu clase original
+            console.log(user)
+            const text = user.estadoAmistad === null ? 'solicitud' : user.estadoAmistad;
+            const estilo = user.estadoAmistad === null ? 'btn-primary' : 'btn-secondary'
+            const desabilitar = user.estadoAmistad === null ? '' : 'disabled'
             userElement.innerHTML = `
-                <span class="icon">👤</span>
-                <span class="name">${user.name}</span>
-                <span class="meta">${user.email || ''}</span>
-            `;
-            userElement.addEventListener('click', () => {
-                // Aquí puedes redirigir al perfil del usuario o disparar un evento
-                alert(`Seleccionaste usuario: ${user.name}`);
-                // window.location.href = `/users/${user.id}`;
+            <span class="icon">👤</span>
+            <span class="name">${user.name}</span>
+            <span class="meta">${user.email || ''}</span>
+            <button type="button" class="btn ${estilo}  btn-sm ms-2  friend-request-btn ${desabilitar}" data-user-estado='${user.estadoAmistad === null ? '0' : user.estadoAmistad}' data-user-id="${user.id}">
+                <i class="bi bi-person-plus-fill"></i> <span class="button-text">${text}</span>
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+        `;
+
+
+            userElement.addEventListener('click', (event) => {
+                const button = event.target
+
+                const btnEvent = button.closest('.friend-request-btn');
+                if (btnEvent) { handleFriendRequest(btnEvent) }
             });
+
             usersSection.appendChild(userElement);
         });
+
+
         searchResultsDiv.appendChild(usersSection);
     }
 

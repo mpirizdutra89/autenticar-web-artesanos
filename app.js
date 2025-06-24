@@ -21,6 +21,7 @@ const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const albumRoutes = require('./routes/albumRoutes')
 const panelNotificacionesRoutes = require('./routes/panelNotificacion');
+const compartirRoutes = require('./routes/compartirRoutes');
 //multer
 const { multerErrorHandler } = require('./middleware/uploadMiddleware');
 // Importa el middleware de autenticación notificacion
@@ -113,6 +114,7 @@ app.set('trust proxy', 1);
     app.use('/panel-notificacion', isAuthenticated, panelNotificacionesRoutes)
     app.use('/album', isAuthenticated, albumRoutes)
     app.use('/search', searchRoute);
+    app.use('/compartir', compartirRoutes);
 
 
 

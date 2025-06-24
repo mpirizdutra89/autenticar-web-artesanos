@@ -8,7 +8,7 @@
 const UserModelo = require('../models/UserModel');
 const AlbumModel = require('../models/albumModel')
 
-const globalSearch = async (query) => {
+const globalSearch = async (query, user_id) => {
     // Escapa la query para evitar inyección SQL si estás usando consultas directas
     // Si usas un ORM o prepared statements, esto se maneja automáticamente.
     const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapa caracteres especiales para regex
@@ -23,7 +23,7 @@ const globalSearch = async (query) => {
 
 
         // Simulamos resultados para usuarios
-        results.users = await searchUsers(escapedQuery);
+        results.users = await searchUsers(escapedQuery, user_id);
 
         // Simulamos resultados para álbumes por título
         results.albumsByTitle = await searchAlbumsByTitle(escapedQuery);
@@ -42,45 +42,17 @@ const globalSearch = async (query) => {
 // --- FUNCIONES SIMULADAS DE BÚSQUEDA ---
 // Reemplaza estas funciones con tus consultas reales a la base de datos
 
-async function searchUsers(query) {
+async function searchUsers(query, user_id) {
 
-    /* // Simulación con datos estáticos
-    const dummyUsers = [
-        { id: 1, name: 'Martín Pérez', email: 'martin.p@example.com' },
-        { id: 2, name: 'Ana García', email: 'ana.g@example.com' },
-        { id: 3, name: 'Carlos Díaz', email: 'carlos.d@example.com' },
-        { id: 4, name: 'Laura Martinez', email: 'laura.m@example.com' },
-        { id: 5, name: 'Juan Sanchez', email: 'juan.s@example.com' },
-    ];
-    return dummyUsers.filter(user =>
-        user.name.toLowerCase().includes(query.toLowerCase()) ||
-        user.email.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5); // Limitar a 5 resultados */
-    const foundUsers = await UserModelo.searchUsers(query);
+
+    const foundUsers = await UserModelo.searchUsers(query, user_id);
     console.log(`Buscar usuario......${query}`)
     console.log(foundUsers);
     return foundUsers;
 }
 
 async function searchAlbumsByTitle(query) {
-    // Ejemplo de búsqueda en una tabla 'albums' por 'title'
-    // En SQL sería algo como:
-    // SELECT id, title, artist FROM albums WHERE title LIKE '%${query}%' LIMIT 5;
-    // O con MongoDB (Mongoose):
-    // return Album.find({ title: { $regex: query, $options: 'i' } }).limit(5);
 
-    // Simulación con datos estáticos
-    /* const dummyAlbums = [
-        { id: 101, title: 'Revolución Sonora', artist: 'Banda X' },
-        { id: 102, title: 'Ecos del Tiempo', artist: 'Solista Y' },
-        { id: 103, title: 'Luces de Ciudad', artist: 'Grupo Z' },
-        { id: 104, title: 'Sueños Perdidos', artist: 'Cantante A' },
-        { id: 105, title: 'Noches Blancas', artist: 'Duo B' },
-        { id: 105, title: 'Martin Blancas', artist: 'Duo B' }
-    ];
-    return dummyAlbums.filter(album =>
-        album.title.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5); // Limitar a 5 resultados */
     const foundUsers = await AlbumModel.searchAlbumPortafolio(query);
     console.log(`Buscar Album portafolio solo publico......${query}`)
     console.log(foundUsers);

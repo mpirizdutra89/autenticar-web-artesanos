@@ -24,76 +24,69 @@ class UserModel {
         }
     }
 
-    //Buscador
-    /*  static async buscarUsuarioYPerfil(emailBusqueda, nombreApellidoBusqueda) {
-         let connection;
-         try {
-             connection = await pool.getConnection(); // Obtener una conexión del pool
- 
- 
-             const [rows] = await connection.execute(
-                 'CALL buscar_usuario_y_perfil(?, ?)',
-                 [emailBusqueda, nombreApellidoBusqueda]
-             );
- 
- 
-             if (rows && rows.length > 0 && rows[0].length > 0) {
- 
-                 if (rows[0][0] && rows[0][0].Mensaje) {
-                     console.log("Mensaje del procedimiento:", rows[0][0].Mensaje);
-                     return { success: false, message: rows[0][0].Mensaje };
-                 } else {
-                     console.log("Resultados de la búsqueda:", rows[0]);
-                     return { success: true, data: rows[0] };
-                 }
-             } else {
-                 console.log("No se encontraron resultados o la respuesta fue inesperada.");
-                 return { success: true, data: [] }; // No se encontraron resultados
-             }
- 
-         } catch (error) {
-             console.error('Error al ejecutar el procedimiento almacenado:', error);
-             // Aquí podrías loggear el error o enviarlo a un servicio de monitoreo
-             throw new Error('Fallo en la búsqueda de usuario/perfil: ' + error.message);
-         } finally {
-             if (connection) {
-                 connection.release(); // Liberar la conexión de vuelta al pool
-             }
-         }
-     } */
-    static async searchUsers(query) {
+
+    static async searchUsers(query, user_id) {
         let connection;
         try {
-            connection = await pool.getConnection(); // Obtenemos una conexión del pool
+            connection = await pool.getConnection();
 
-            // Pasamos la 'query' a ambos parámetros del procedimiento almacenado
+
             const [rows] = await connection.execute(
-                'CALL buscar_usuario_y_perfil(?)',
-                [query]
+                'CALL buscar_usuario_y_perfil(?,?)',
+                [query, user_id]
             );
 
             const results = rows[0];
 
-            // Verificamos si el procedimiento nos devolvió un mensaje de error
+
             if (results && results.length > 0 && results[0].Mensaje) {
                 console.warn("Mensaje del procedimiento:", results[0].Mensaje);
-                return []; // Retorna un array vacío si el SP devolvió un mensaje de error
+                return [];
             }
 
-            // Mapeamos los resultados de la base de datos al formato deseado
-            // y ¡quitamos el .slice(0, 5)!
-            return results.map(userRow => ({
-                id: userRow.id,
-                name: userRow.nombre ? `${userRow.nombre} ${userRow.apellido || ''}`.trim() : null,
-                email: userRow.email
-            }));
+
+
+            return results.map(userRow => {
+                let buttonText;
+                let buttonAction;
+
+
+                if (userRow.estadoAmistad == null) {
+                    buttonText = "Enviar Solicitud";
+                    buttonAction = "send_request";
+                } else if (userRow.estadoAmistad == 'pendiente') {
+                    buttonText = "Solicitud Enviada";
+                    buttonAction = "cancel_request";
+                } else if (userRow.estadoAmistad == 'aceptada') {
+                    buttonText = "Amigos";
+                    buttonAction = "view_profile";
+                } else if (userRow.estadoAmistad == 'rechazada') {
+                    buttonText = "Solicitud Rechazada";
+                    buttonAction = "resend_request";
+                } else {
+                    buttonText = "Estado Desconocido";
+                    buttonAction = "none";
+                }
+
+                return {
+                    id: userRow.id,
+                    name: userRow.nombre ? `${userRow.nombre} ${userRow.apellido || ''}`.trim() : null,
+                    email: userRow.email,
+                    profileImageUrl: userRow.imagen_perfil_url,
+                    estadoAmistad: userRow.estado_amistad,
+                    button: {
+                        text: buttonText,
+                        action: buttonAction
+                    }
+                };
+            });
 
         } catch (error) {
             console.error('Error al buscar usuarios en la base de datos:', error);
             throw new Error('Fallo en la búsqueda de usuarios: ' + error.message);
         } finally {
             if (connection) {
-                connection.release(); // Siempre liberamos la conexión
+                connection.release();
             }
         }
     }

@@ -686,6 +686,10 @@ body {
     background-color: #555;
 }
 
+.sinhover:hover{
+      background-color: #55555500;
+}
+
 .search-result-item .icon {
     margin-right: 10px;
     font-size: 1.2em;

@@ -43,9 +43,9 @@ html(lang="es")
 
                 // Menú desplegable del perfil de usuario
                 .dropdown
-                  a.nav-link.dropdown-toggle(href="#", id="navbarDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
+                  a.nav-link.dropdown-toggle(href="#", id="navbarDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false", style='text-transform: capitalize')
                     img.profile-pic.me-1(src="/img/perfil_default/default.png", alt="Foto de Perfil de Usuario")
-                    | ArtistaEjemplo
+                    | #{user.nombre} 
                   ul.dropdown-menu.dropdown-menu-end(aria-labelledby="navbarDropdown")
                     li
                       a.dropdown-item(href="#", data-bs-toggle="offcanvas", data-bs-target="#profileOffcanvas") Mi Perfil
@@ -89,7 +89,7 @@ html(lang="es")
     // Usamos 'block append scripts' para que las vistas que extienden este layout puedan añadir sus propios scripts AQUÍ.
     // Esto asegura que 'notificaciones.js' se cargue antes que cualquier script específico de una vista.
     script(src='/js/notificaciones.js' type="module")
-    script(src="/js/buscar.js")
+    script(src="/js/buscar.js" type="module")
     script(src="/js/global.js" type="module")
 
     // Este 'block scripts' se puede usar en tus vistas que extienden el layout

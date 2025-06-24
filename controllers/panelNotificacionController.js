@@ -93,9 +93,81 @@ const marcarNotificacionLeida = async (req, res) => {
         res.status(500).json(respuesta);
     }
 };
+//body: JSON.stringify({ referenciaId: referenciaId, action: accion, idNotficacion: idNotficacion })
+const aceptarORechazarSolicitud = async (req, res) => {
+    try {
+
+
+        const { referenciaId, action, idNotficacion } = req.body;
+        const receptorId = req.session.user.id
+        if (referenciaId == 0 || idNotficacion == 0) {
+            res.status(401).json({
+                message: 'Error: Falta informacion crucial para proceder.',
+                success: false
+            })
+        }
+
+        const resultado = await Notificacion.responderSolicitud(referenciaId, action, idNotficacion, receptorId)
+        if (!resultado.success) {
+            res.status(401).json({
+                message: 'Error: ID de usuario no proporcionado en el cuerpo de la solicitud.',
+                success: false
+            });
+        }
+        //envio de notificacion
+        generarNotificacionTest(req, resultado.idNotificacionGenerada, resultado.idSolicitanteNotificado)
+
+        res.status(200).json({
+            message: resultado.message,
+            status: resultado.nuevoEstado,
+            timestamp: new Date().toISOString()
+        });
+
+
+    } catch (error) {
+        res.status(500).render('error', {
+            title: 'Error Interno',
+            message: 'Ocurrió un error al generar .'
+        });
+    }
+
+}
+
+
+
+const generarNotificacionTest = async (req, notificacionoID, userId) => {
+
+
+    try {
+        if (!notificacionoID && !userId) {
+            return;
+        }
+        console.log(`generarNotificacionTest(): notificacion id: ${notificacionoID} -- receptor id ${userId}`)
+        const createdNotif = await Notificacion.findById(notificacionoID);
+
+
+        const io = req.app.get('socketio');
+        if (io && createdNotif) {
+            io.to(`user_${userId}`).emit('nueva_notificacion', createdNotif);
+            console.log(`Notificación emitida en tiempo real para usuario ${userId}:`, createdNotif);
+        } else {
+            console.warn('Socket.IO no está disponible o no se pudo recuperar la notificación creada.');
+        }
+
+
+
+    } catch (error) {
+        console.error('Error al generar notificación de prueba:', error);
+
+    }
+};
+
+
 
 module.exports = {
     GetnotificacionPage,
     readNotificacion,
-    marcarNotificacionLeida
+    marcarNotificacionLeida,
+    aceptarORechazarSolicitud
+
 };

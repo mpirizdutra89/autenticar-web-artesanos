@@ -1,29 +1,7 @@
 
 
 import { NOTIFICACION_TYPE, formatStringWithUnderscores, showFloatingAlert, isObjectEmpty } from './funcionesjs/utils.js';
-//#notificacion-container   #nrNotificacion
 
-
-//const socket = io();
-/* const socket = io('https://artesanos.mpiridutra.site', {
-    transports: ['websocket', 'polling'], // Especifica los transportes a utilizar
-    reconnection: true, // Habilita la reconexión automática
-    reconnectionAttempts: 5, // Intentos de reconexión
-    reconnectionDelay: 1000, // Retraso entre intentos de reconexión (en milisegundos)
-    timeout: 20000, // Tiempo de espera para conectar (en milisegundos)
-    //  query: { token: 'mi_token_aqui' }, // Pasar parámetros en la query string
-    autoConnect: true, // Conectar automáticamente
-
-}); */
-/* const socket = io('https://artesanos.mpiridutra.site', {
-    transports: ['websocket', 'polling'], // Aún especificamos esto para la prioridad
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 1000,
-    timeout: 20000,
-    autoConnect: true,
-    // NO se envían 'query' ni 'extraHeaders' aquí para el token
-}); */
 
 const socket = io(obtenerBaseUrlNavegador(), {
     transports: ['websocket', 'polling'],
@@ -92,6 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (notificationList) { // Asegúrate de que notificationList exista
             notificationList.prepend(crearItemPersonalisado(notif));
 
+            notificationList.addEventListener('click', (event) => {
+                const button = event.target.closest('.btn-Aceptar-rechchazar')
+                if (button) {
+                    aceptarORechazar(button)
+                }
+            })
+
         } else if (notificacionUnread) {
 
             notificacionUnread.prepend(crearItemPersonalisadoPanel(notif));
@@ -152,8 +137,8 @@ function crearItemPersonalisadoPanel(notif) {
                             <div class="notification-meta">
                                
                                 <div class="buttons-group" style="display:${leida === 0 ? 'block' : 'none'}">
-                                     <button class="btn btn-md btn-outline-success rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" >Aceptar</button>
-                                    <button class="btn btn-md btn-outline-danger rounded-pill btn-action mark-as-read-btn" data-id="${notif.id}"  data-tipo="${tipo}">Rechazar</button>
+                                     <button class="btn btn-md btn-outline-success rounded-pill btn-action btn-Aceptar-rechchazar" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" >Aceptar</button>
+                                    <button class="btn btn-md btn-outline-danger rounded-pill btn-action btn-Aceptar-rechchazar" data-id="${notif.id}"  data-tipo="${tipo}">Rechazar</button>
                                 </div>
                             </div>
                         </div>`
@@ -253,6 +238,8 @@ function crearItemPersonalisado(notif, final = false) {
         notificationItem.id = `notif-${notif.id}`
     }
 
+    console.log(`Tipo de notificacion cearItemPersonalisado() ${tipo}`)
+    console.log(notif)
     //notificationItem.className = ' ' /* + (notif.leida ? '' : 'list-group-item-warning') */
     notificationItem.innerHTML = ''
 
@@ -266,8 +253,14 @@ function crearItemPersonalisado(notif, final = false) {
                             ${notif.mensaje}
                         </p>
                         <div class="d-flex justify-content-end mt-2 mb-1">  
-                            <button class="btn btn-outline-success me-2 mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}">Aceptar</button>
-                            <button class="btn btn-outline-danger mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia} " data-tipo="${tipo}">Rechazar</button>
+                            <button class="btn btn-outline-success me-2 btn-Aceptar-rechchazar" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" data-accion='aceptada'>
+                                 <i class="bi bi-person-plus-fill"></i> <span class="button-text">Aceptar</span>
+                                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                            <button class="btn btn-outline-danger btn-Aceptar-rechchazar" data-id="${notif.id}" data-referens="${notif.id_referencia} " data-tipo="${tipo}"  data-accion='rechazada'>
+                                <i class="bi bi-person-plus-fill"></i> <span class="button-text">Rechazar</span>
+                                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
                         </div >
                         <small class="text-muted">${new Date(notif.fecha_creacion).toLocaleString()}</small>`
             break
@@ -281,7 +274,7 @@ function crearItemPersonalisado(notif, final = false) {
                         ${notif.mensaje}
                     </p>
                     <div class="d-flex justify-content-end mt-2">
-                        <button class="btn btn-outline-danger me-2 mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Marcar como leida" ><i class="bi bi-check-square-fill"></i></button>
+                        <button class="btn btn-outline-info me-2 mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Marcar como leida" ><i class="bi bi-check-square-fill"></i></button>
                     </div >
                     <small class="text-muted">${new Date(notif.fecha_creacion).toLocaleString()}</small>`
             break
@@ -296,7 +289,7 @@ function crearItemPersonalisado(notif, final = false) {
                         ${notif.mensaje}
                     </p>
                     <div class="d-flex justify-content-end mt-2">
-                        <button class="btn btn-outline-success me-2 mark-as-read-btn" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}">ver</button>
+                        <button class="btn btn-outline-success me-2 btn-ver-comentario" data-id="${notif.id}" data-referens="${notif.id_referencia}" data-tipo="${tipo}">ver</button>
                     </div >
                     <small class="text-muted">${new Date(notif.fecha_creacion).toLocaleString()}</small>`
             break
@@ -342,7 +335,7 @@ function tipoIcono(tipo) {
             icon = '<i class="bi bi-person-plus-fill text-success notification-icon"></i>'
             break;
         case NOTIFICACION_TYPE.SOLICITUD_AMISTAD_RESP:
-            icon = '<i class="bi bi-person-plus-fill text-danger notification-icon"></i>'
+            icon = '<i class="bi bi-person-plus-fill text-info notification-icon"></i>'
             break;
         case NOTIFICACION_TYPE.NUEVO_COMENTARIO:
             icon = '<i class="bi bi-chat-right-text-fill text-primary  notification-icon"></i>'
@@ -363,20 +356,13 @@ function tipoIcono(tipo) {
 
 //if (notificacionUnread || notificationList) {
 socket.on('nueva_notificacion', (notificacion) => {
-    console.log('Nueva notificación recibida:', notificacion);
-    /*   const notificationItem = document.createElement('div');
-      notificationItem.id = `notif-${notificacion.id}`;
-      notificationItem.className = 'list-group-item notification-item list-group-item-warning';
-      notificationItem.innerHTML = `
-        <div class="d-flex w-100 justify-content-between">
-          <h6 class="mb-1">${notificacion.mensaje}</h6>
-          <button class="btn btn-sm btn-outline-secondary mark-as-read-btn" data-id="${notificacion.id}">Marcar como leída</button>
-        </div>
-        <small class="text-muted">${new Date(notificacion.fecha_creacion).toLocaleString()}</small>
-      `; */
+    console.log('Nueva notificación recibida1:', notificacion);
+    //solo muestro una  en caso de que en el servidor mande mas hay que usar un for
     if (notificationList) {
-        // notificationList.prepend(notificationItem);
-        notificationList.prepend(crearItemPersonalisado(notificacion));
+        notificacion.forEach(notif => {
+            notificationList.prepend(crearItemPersonalisado(notif, undefined));
+        });
+
     }
     updateUnreadCount(1);
     if (noNotificationsMessage) noNotificationsMessage.style.display = 'none';
@@ -389,6 +375,8 @@ socket.on('notificaciones_iniciales', (notificaciones) => {
     // Lógica para reemplazar/actualizar la lista completa de notificaciones si es necesario
 });
 
+
+//panel
 if (notificacionUnread) {
     btnTabRead.addEventListener('click', async (event) => {
         try {
@@ -472,7 +460,78 @@ if (notificacionUnread) {
         }
     });
 }
-function inicializarTooltips() {
+/* function inicializarTooltips() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+} */
+
+
+const aceptarORechazar = async (buttonEvento) => {
+    const estado = buttonEvento.dataset.tipo
+    const referenciaId = buttonEvento.dataset.referens
+    const idNotficacion = buttonEvento.dataset.id
+    const accion = buttonEvento.dataset.accion
+    const buttonTextSpan = buttonEvento.querySelector('.button-text');
+    const spinnerSpan = buttonEvento.querySelector('.spinner-border');
+
+    buttonEvento.setAttribute('disabled', true);
+    if (buttonTextSpan) { // Asegurarse de que el span existe
+        buttonTextSpan.classList.add('d-none'); // Oculta el texto
+    }
+    if (spinnerSpan) { // Asegurarse de que el spinner existe
+        spinnerSpan.classList.remove('d-none'); // Muestra el spinner
+    }
+
+
+
+    try {
+
+        const response = await fetch('/panel-notificacion/aceptar-solicitud/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+
+            },
+            body: JSON.stringify({ referenciaId: referenciaId, action: accion, idNotficacion: idNotficacion })
+        });
+
+
+        await new Promise(resolve => setTimeout(resolve, 500)); // Espera 0.5 segundos
+
+        if (response.ok) {
+
+            const result = await response.json(); // Si esperas un JSON de respuesta
+            console.log('Solicitud enviada, respuesta:', result); // Para depuración
+            const itemToUpdate = document.getElementById(`notif-${idNotficacion}`);
+            itemToUpdate.remove()
+            showFloatingAlert(result.message ? result.message : 'La respuesta fue procesada', 'success', 'bottom', 3000)
+        } else {
+
+            const errorText = await response.text(); // Leer como texto si no es JSON
+            console.error(`Error ${response.status}:`, errorText); // Para depuración
+
+            showFloatingAlert('Ocurrio un fallo en el envio de la respuesta', 'danger', 'bottom', 5000)
+        }
+
+        if (buttonTextSpan) {
+            buttonTextSpan.classList.remove('d-none');
+            buttonTextSpan.textContent = 'Solicitud'; // Volver al texto original
+        }
+        if (spinnerSpan) {
+            spinnerSpan.classList.add('d-none');
+        }
+        buttonEvento.removeAttribute('disabled');
+
+
+    } catch (error) {
+
+        console.error('Error de conexión o al enviar respuesta:', error);
+
+    }
 }
+
+
+
+
+
+
