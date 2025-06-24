@@ -1,6 +1,19 @@
 const AMISTAD_TYPE = require('../models/enumAmistad');
 const AmistadModel = require('../models/amistadModelo')
 const Notificacion = require('../models/Notificacion')
+const activeTab = 'shared-albums'
+
+const getPageCompartir = async (req, res) => {
+    res.render('shared_albums', {
+        title: 'Album compartidos',
+        panel_notificacion: true,
+        activeTab: activeTab
+
+    });
+
+}
+
+
 
 const solicitud = async (req, res) => {
     try {
@@ -75,5 +88,6 @@ const generarNotificacionTest = async (req, notificacionoID, userId) => {
 
 
 module.exports = {
-    solicitud
+    solicitud,
+    getPageCompartir
 }
